@@ -1,6 +1,5 @@
 package cn.ltshark.util;
 
-import com.google.common.io.Files;
 import sun.misc.BASE64Encoder;
 import sun.security.x509.*;
 
@@ -13,8 +12,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
 
 //import sun.security.x509.X500Signer;
@@ -54,8 +51,7 @@ public class GenX509Cert {
         // This class defines the X509Key attribute for the Certificate.
         x509certinfo.set("key", new CertificateX509Key(clientKeypair.getPublic()));
 
-        X500Name subject = new X500Name(
-                "CN=10000000, OU=Network, OU=YAIC, DC=yaic, DC=com, DC=cn");
+        X500Name subject = new X500Name("CN=10000000, OU=Network, OU=YAIC, DC=yaic, DC=com, DC=cn");
 
         x509certinfo.set("subject.dname", subject);
 
@@ -74,52 +70,36 @@ public class GenX509Cert {
                 bdate, edate);
 
         x509certinfo.set("validity", certificatevalidity);
+        CertificateExtensions exts = (CertificateExtensions) x509certinfo.get(X509CertInfo.EXTENSIONS);
 
-        // This class defines the SerialNumber attribute for the Certificate.
-        // 设置有效期域（包含开始时间和到期时间）域名等同与x509certinfo.VALIDITY
-        x509certinfo.set("serialNumber", new CertificateSerialNumber(
-                (int) (new Date().getTime() / 1000L)));
+        GeneralNames generalNames = new GeneralNames();
+        generalNames.add(new GeneralName(new RFC822Name("10000000@yaic.com.cn")));
+        SubjectAlternativeNameExtension subjectAlternativeNameExtension = new SubjectAlternativeNameExtension(false, generalNames);
+        exts.set("SubjectAlternativeName", subjectAlternativeNameExtension);
+        exts.set("SubjectKeyIdentifier", new SubjectKeyIdentifierExtension(new KeyIdentifier(clientKeypair.getPublic()).getIdentifier()));
+
+        x509certinfo.set(X509CertInfo.EXTENSIONS, exts);
+        x509certinfo.set("serialNumber", new CertificateSerialNumber(10000000));
 
         X509CertImpl x509certimpl1 = new X509CertImpl(x509certinfo);
-
         x509certimpl1.sign(rootPrivKey, "SHA1withRSA");
-        // 使用另一个证书的私钥来签名此证书 这里使用 md5散列 用rsa来加密
-
         BASE64Encoder base64 = new BASE64Encoder();
-
         FileOutputStream fos = new FileOutputStream(new File("d:\\key\\10000000.crt"));
-
         base64.encodeBuffer(x509certimpl1.getEncoded(), fos);
-
         try {
             Certificate[] certChain = {x509certimpl1};
-
-            savePfx("10000000", clientKeypair.getPrivate(), "1234", certChain,
-                    "d:\\key\\10000000.pfx");
-
+            savePfx("10000000", clientKeypair.getPrivate(), "1234", certChain, "d:\\key\\10000000.pfx");
             FileInputStream in = new FileInputStream("d:\\key\\10000000.pfx");
-
             KeyStore inputKeyStore = KeyStore.getInstance("pkcs12");
-
             inputKeyStore.load(in, "1234".toCharArray());
-
             Certificate cert = inputKeyStore.getCertificate("10000000");
-
             System.out.print(cert.getPublicKey());
-
-            PrivateKey privk = (PrivateKey) inputKeyStore.getKey("10000000",
-                    "1234".toCharArray());
-
-            FileOutputStream privKfos = new FileOutputStream(new File(
-                    "d:\\key\\10000000.pvk"));
-
+            PrivateKey privk = (PrivateKey) inputKeyStore.getKey("10000000", "1234".toCharArray());
+            FileOutputStream privKfos = new FileOutputStream(new File("d:\\key\\10000000.pvk"));
             privKfos.write(privk.getEncoded());
-
             System.out.print(privk);
             // base64.encode(key.getEncoded(), privKfos);
-
             in.close();
-
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -202,98 +182,6 @@ public class GenX509Cert {
         out.close();
     }
 
-    /**
-     * 颁布根证书，自己作为CA
-     *
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.security.NoSuchProviderException
-     * @throws java.security.InvalidKeyException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws java.security.SignatureException
-     * @throws java.security.UnrecoverableKeyException
-     */
-    public void createRootCA() throws NoSuchAlgorithmException,
-            NoSuchProviderException, InvalidKeyException, IOException,
-            CertificateException, SignatureException, UnrecoverableKeyException {
-
-        // 参数分别为公钥算法、签名算法 providername（因为不知道确切的 只好使用null 既使用默认的provider）
-        // Generate a pair of keys, and provide access to them.
-        CertAndKeyGen cak = new CertAndKeyGen("RSA", "MD2WithRSA", null);
-
-        // Sets the source of random numbers used when generating keys.
-        cak.setRandom(sr);
-
-        // Generates a random public/private key pair, with a given key size.
-        cak.generate(1024);
-
-        // Constructs a name from a conventionally formatted string, such as
-        // "CN=Dave, OU=JavaSoft, O=Sun Microsystems, C=US". (RFC 1779 or RFC
-        // 2253 style)
-        X500Name subject = new X500Name(
-                "CN=RootCA,OU=hackwp,O=wp,L=BJ,S=BJ,C=CN");
-
-        // Returns a self-signed X.509v3 certificate for the public key. The
-        // certificate is immediately valid. No extensions.
-        // Such certificates normally are used to identify a "Certificate
-        // Authority" (CA). Accordingly, they will not always be accepted by
-        // other parties. However, such certificates are also useful when you
-        // are bootstrapping your security infrastructure, or deploying system
-        // prototypes.自签名的根证书
-        X509Certificate certificate = cak.getSelfCertificate(subject,
-                new Date(), 3650 * 24L * 60L * 60L);
-
-        X509Certificate[] certs = {certificate};
-
-        try {
-
-            savePfx("RootCA", cak.getPrivateKey(), "1234", certs,
-                    "d:\\key\\RootCa.pfx");
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-        }
-
-        // 后一个long型参数代表从现在开始的有效期 单位为秒（如果不想从现在开始算 可以在后面改这个域）
-        BASE64Encoder base64 = new BASE64Encoder();
-
-        FileOutputStream fos = new FileOutputStream(new File("d:\\key\\RootCa.crt"));
-
-        // fos.write(certificate.getEncoded());
-
-        // 生成（保存）cert文件 base64加密 当然也可以不加密
-        base64.encodeBuffer(certificate.getEncoded(), fos);
-
-        fos.close();
-
-    }
-
-    public PrivateKey loadPrivateKey(File file) throws IOException {
-        return loadPrivateKey(Files.toByteArray(file));
-    }
-
-    public PrivateKey loadPrivateKey(byte[] privateKeyStr) throws IOException {
-        try {
-//            Base64 base64 = new Base64();
-//            byte[] buffer = base64.decode(privateKeyStr.getBytes());
-            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyStr);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            PrivateKey privateKey = (PrivateKey) keyFactory.generatePrivate(keySpec);
-            return privateKey;
-        } catch (NoSuchAlgorithmException e) {
-            throw new IOException("无此算法");
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-            throw new IOException("私钥非法");
-        /*} catch (IOException e) {
-            throw new IOException("私钥数据内容读取错误");*/
-        } catch (NullPointerException e) {
-            throw new IOException("私钥数据为空");
-        }
-    }
-
     public void signCert() throws NoSuchAlgorithmException,
             CertificateException, IOException, UnrecoverableKeyException,
             InvalidKeyException, NoSuchProviderException, SignatureException {
@@ -303,6 +191,7 @@ public class GenX509Cert {
             KeyStore ks = KeyStore.getInstance("pkcs12");
 
             FileInputStream ksfis = new FileInputStream("d:\\key\\YAICDC01.pfx");
+//            FileInputStream ksfis = new FileInputStream("d:\\key\\10000000.pfx");
 
             char[] storePwd = "1234".toCharArray();
 
@@ -323,8 +212,8 @@ public class GenX509Cert {
             // TrustedCertificateEntry 为参数的 setEntry
             // 创建的条目，则返回包含在该条目中的可信证书。如果给定的别名标识通过调用 setKeyEntry 创建的条目，或者通过调用以
             // PrivateKeyEntry 为参数的 setEntry 创建的条目，则返回该条目中证书链的第一个元素。
-            X509Certificate rootCert = (X509Certificate) ks
-                    .getCertificate("yaic-YAICDC01-CA");
+            X509Certificate rootCert = (X509Certificate) ks.getCertificate("yaic-YAICDC01-CA");
+//            X509Certificate rootCert = (X509Certificate) ks.getCertificate("10000000");
 
             CertificateFactory certificatefactory = CertificateFactory.getInstance("X.509");
             FileInputStream bais = new FileInputStream("d:\\key\\ss.cer");
@@ -361,7 +250,6 @@ public class GenX509Cert {
 
             GenX509Cert gcert = new GenX509Cert();
 
-//            gcert.createRootCA();
 
             gcert.signCert();
 
@@ -370,4 +258,5 @@ public class GenX509Cert {
             e.printStackTrace();
         }
     }
+
 }
