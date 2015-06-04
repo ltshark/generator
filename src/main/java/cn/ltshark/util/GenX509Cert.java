@@ -1,6 +1,8 @@
 package cn.ltshark.util;
 
 import sun.misc.BASE64Encoder;
+import sun.security.util.DerValue;
+import sun.security.util.ObjectIdentifier;
 import sun.security.x509.*;
 
 import java.io.File;
@@ -26,6 +28,7 @@ public class GenX509Cert {
      * 提供强加密随机数生成器 (RNG)*
      */
     private SecureRandom sr;
+    private static String UPNOID = "1.3.6.1.4.1.311.20.2.3";
 
     public GenX509Cert() throws NoSuchAlgorithmException,
             NoSuchProviderException {
@@ -73,7 +76,10 @@ public class GenX509Cert {
         CertificateExtensions exts = (CertificateExtensions) x509certinfo.get(X509CertInfo.EXTENSIONS);
 
         GeneralNames generalNames = new GeneralNames();
-        generalNames.add(new GeneralName(new RFC822Name("10000000@yaic.com.cn")));
+//        "10000000@yaic.com.cn"
+        ObjectIdentifier upnoid = new ObjectIdentifier(UPNOID);
+
+        generalNames.add(new GeneralName(new OtherName(upnoid, getUTF8String("10000000@yaic.com.cn"))));
         SubjectAlternativeNameExtension subjectAlternativeNameExtension = new SubjectAlternativeNameExtension(false, generalNames);
         exts.set("SubjectAlternativeName", subjectAlternativeNameExtension);
         exts.set("SubjectKeyIdentifier", new SubjectKeyIdentifierExtension(new KeyIdentifier(clientKeypair.getPublic()).getIdentifier()));
@@ -108,6 +114,19 @@ public class GenX509Cert {
         // 生成文件
         x509certimpl1.verify(rootCert.getPublicKey(), null);
 
+    }
+
+    private byte[] getUTF8String(String userData) {
+//        String userData = "10000000@yaic.com.cn";
+        byte l = (byte) userData.length();// 数据总长17位
+        byte f = 12;
+        byte[] bs = new byte[userData.length() + 2];
+        bs[0] = f;
+        bs[1] = l;
+        for (int i = 2; i < bs.length; i++) {
+            bs[i] = (byte) userData.charAt(i - 2);
+        }
+        return bs;
     }
 
     /**
