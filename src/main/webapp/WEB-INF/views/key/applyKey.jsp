@@ -34,12 +34,11 @@
         <table>
             <tr>
                 <td>
-
-                    <button type="button" name="hardware" class="btn" style="height:90px;width:100px;">硬件证书申请</button>
+                    <a href="${ctx}/key/create?keyType=1"><button type="button" name="hardware" class="btn" style="height:90px;width:100px;">硬件证书申请</button></a>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <button type="button" name="software" class="btn" style="height:90px;width:100px;">软件证书申请</button>
+                    <a href="${ctx}/key/create?keyType=1"><button type="button" name="software" class="btn" style="height:90px;width:100px;">软件证书申请</button></a>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <button type="button" name="temp" class="btn" style="height:90px;width:100px;">临时证书申请</button>
+                    <a href="${ctx}/key/create?keyType=2"><button type="button" name="temp" class="btn" style="height:90px;width:100px;">临时证书申请</button></a>
                 </td>
             </tr>
             <tr>
