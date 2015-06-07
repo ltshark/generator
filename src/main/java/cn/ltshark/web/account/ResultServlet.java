@@ -23,7 +23,7 @@ public class ResultServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 //        response.setContentType("text/html;charset=utf-8");
-        String validateC = (String) request.getSession().getAttribute("validateCode");
+        String validateC = (String) request.getSession().getAttribute(VerifyCodeServlet.KEY_VALIDATE_CODE);
         logger.info(validateC);
         String veryCode = request.getParameter("c");
         logger.info(veryCode);

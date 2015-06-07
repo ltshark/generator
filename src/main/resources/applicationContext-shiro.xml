@@ -15,12 +15,19 @@
 	<bean id="shiroDbRealm" class="cn.ltshark.service.account.ShiroDbRealm">
 		<property name="accountService" ref="accountService"/>
 	</bean>
-	
+
+	<bean id="myCaptchaFilter" class="cn.ltshark.shiro.FormAuthenticationCaptchaFilter"/>
+
 	<!-- Shiro Filter -->
 	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
 		<property name="securityManager" ref="securityManager" />
 		<property name="loginUrl" value="/login" />
 		<property name="successUrl" value="/" />
+		<property name="filters">
+			<map>
+				<entry key="authc" value-ref="myCaptchaFilter"/>
+			</map>
+		</property>
 		<property name="filterChainDefinitions">
 			<value>
 				/login = authc
@@ -28,7 +35,7 @@
 				/static/** = anon
 				/api/** = anon
 				/xuan/** = anon
-				/resultServlet/** = anon
+				<!--/resultServlet/** = anon-->
 				/register/** = anon
 				/admin/** = roles[admin]
 				/** = user

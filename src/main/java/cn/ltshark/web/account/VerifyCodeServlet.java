@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class VerifyCodeServlet extends HttpServlet {
+
+    public static String KEY_VALIDATE_CODE = "validateCode";
+
     // 验证码图片的宽度。
     private int width = 60;
     // 验证码图片的高度。
@@ -109,7 +112,7 @@ public class VerifyCodeServlet extends HttpServlet {
         }
         // 将四位数字的验证码保存到Session中。
         HttpSession session = req.getSession();
-        session.setAttribute("validateCode", randomCode.toString());
+        session.setAttribute(KEY_VALIDATE_CODE, randomCode.toString());
         // 禁止图像缓存。
         resp.setHeader("Pragma", "no-cache");
         resp.setHeader("Cache-Control", "no-cache");
