@@ -54,6 +54,11 @@ public class KeyTaskService {
         return keyTaskDao.findAll(spec, pageRequest);
     }
 
+    public List<KeyTask> getUserKeyTasks(Long userId, Map<String, Object> searchParams) {
+        Specification<KeyTask> spec = buildSpecification(userId, searchParams);
+        return keyTaskDao.findAll(spec);
+    }
+
     /**
      * 创建分页请求.
      */

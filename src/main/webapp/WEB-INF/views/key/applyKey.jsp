@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fun"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <html>
 <head>
@@ -34,11 +35,11 @@
         <table>
             <tr>
                 <td>
-                    <a href="${ctx}/key/create?keyType=1"><button type="button" name="hardware" class="btn" style="height:90px;width:100px;">硬件证书申请</button></a>
+                    <a href="${ctx}/key/create?keyType=1"><button type="button" name="hardware" class="btn" style="height:90px;width:100px;" <c:if test="${fun:length(tasks)>0}">disabled</c:if>>硬件证书申请</button></a>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href="${ctx}/key/create?keyType=1"><button type="button" name="software" class="btn" style="height:90px;width:100px;">软件证书申请</button></a>
+                    <a href="${ctx}/key/create?keyType=1"><button type="button" name="software" class="btn" style="height:90px;width:100px;" <c:if test="${fun:length(tasks)>0}">disabled</c:if>>软件证书申请</button></a>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href="${ctx}/key/create?keyType=2"><button type="button" name="temp" class="btn" style="height:90px;width:100px;">临时证书申请</button></a>
+                    <a href="${ctx}/key/create?keyType=2"><button type="button" name="temp" class="btn" style="height:90px;width:100px;" <c:if test="${fun:length(tasks)>0}">disabled</c:if>>临时证书申请</button></a>
                 </td>
             </tr>
             <tr>
@@ -49,7 +50,7 @@
 
             <tr>
                 <td>
-                    <button type="button" name="hardware" class="btn" style="height:35px;width:360px;">证书下载/证书写入KEY
+                    <button type="button" name="hardware" class="btn" style="height:35px;width:360px;" <c:if test="${not canDownload}">disabled</c:if>>证书下载/证书写入KEY
                     </button>
                 </td>
             </tr>

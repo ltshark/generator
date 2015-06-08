@@ -15,11 +15,16 @@ import org.slf4j.LoggerFactory;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springside.modules.web.Servlets;
 
+import javax.servlet.ServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,16 +61,22 @@ public class KeyController {
     private AccountService accountService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String list() {
-//		Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
-//		Long userId = getCurrentUserId();
-//
+    public String list(ServletRequest request, Model model) {
+        User user = accountService.getUser(getCurrentUserId());
+        Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
+        List<KeyTask> keyTasks = keyTaskService.getUserKeyTasks(getCurrentUserId(), searchParams);
 //		Page<Task> tasks = taskService.getUserTask(userId, searchParams, pageNumber, pageSize, sortType);
-//
-//		model.addAttribute("tasks", tasks);
-//		model.addAttribute("sortType", sortType);
-//		model.addAttribute("sortTypes", sortTypes);
-//		// 将搜索条件编码成字符串，用于排序，分页的URL
+        boolean canDownload = false;
+        for (KeyTask task : keyTasks) {
+            if (KeyTask.APPLYED_STATUS.equals(task.getStatus())) {
+                canDownload = true;
+                break;
+            }
+        }
+        model.addAttribute("tasks", keyTasks);
+        model.addAttribute("canDownload", canDownload);
+
+        // 将搜索条件编码成字符串，用于排序，分页的URL
 //		model.addAttribute("searchParams", Servlets.encodeParameterStringWithPrefix(searchParams, "search_"));
 
         return "key/applyKey";
