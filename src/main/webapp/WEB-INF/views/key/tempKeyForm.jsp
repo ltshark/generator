@@ -12,17 +12,25 @@
     <input type="hidden" name="userId" value="${user.id}"/>
     <fieldset>
         <legend>
-            <small>证书申请</small>
+            <small>临时证书申请</small>
         </legend>
         <div class="control-group">
-            <table>
-                <tr><td>姓名&nbsp;:&nbsp;${user.name}</td></tr>
-                <tr><td>部门&nbsp;:&nbsp;${user.name}</td></tr>
-                <tr><td>邮件&nbsp;:&nbsp;${user.name}</td></tr>
-                <tr><td>手机&nbsp;:&nbsp;${user.name}</td></tr>
-                <tr><td>固话&nbsp;:&nbsp;${user.name}</td></tr>
-                <tr><td><i>您正在申请硬件/软件证书文件</i></td></tr>
-            </table>
+            <label for="phone_number" class="control-label">手机号码:</label>
+            <div class="controls">
+                <input type="text" id="phone_number" name="phoneNumber" value="" class="input-large required"
+                       minlength="3"/>
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="code" class="control-label">验证码:</label>
+
+            <div class="controls">
+                <input type="text" id="code" name="code" value="" class="input-large required" minlength="3"/>
+                <input id="code_btn" class="btn btn-primary" type="button" value="获取验证码"/>&nbsp;
+            </div>
+        </div>
+        <div class="controls">
+            <label><i>您正在申请临时证书文件，需要对您的手机进行验证，请完成手机验证</i></label>
         </div>
         <div class="form-actions">
             <input id="submit_btn" class="btn btn-primary" type="submit" value="提交"/>&nbsp;

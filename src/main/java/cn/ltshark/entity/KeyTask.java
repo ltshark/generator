@@ -12,8 +12,10 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "g_key_task")
-public class KeyTask {
+public class KeyTask extends IdEntity {
 
+    public static final String APPLYING_STATUS = "1";
+    public static final String APPLYED_STATUS = "2";
     private String type;
     private User user;
     private String status;

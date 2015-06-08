@@ -5,40 +5,40 @@
  *******************************************************************************/
 package cn.ltshark.web.key;
 
-import cn.ltshark.entity.Task;
+import cn.ltshark.entity.KeyTask;
 import cn.ltshark.entity.User;
 import cn.ltshark.service.account.AccountService;
 import cn.ltshark.service.account.ShiroDbRealm.ShiroUser;
-import cn.ltshark.service.task.TaskService;
+import cn.ltshark.service.key.KeyTaskService;
 import com.google.common.collect.Maps;
+import org.slf4j.LoggerFactory;
 import org.apache.shiro.SecurityUtils;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springside.modules.web.Servlets;
 
-import javax.servlet.ServletRequest;
-import javax.validation.Valid;
 import java.util.Map;
 
 /**
  * Task管理的Controller, 使用Restful风格的Urls:
  * <p/>
- * List page : GET /task/
- * Create page : GET /task/create
- * Create action : POST /task/create
- * Update page : GET /task/update/{id}
- * Update action : POST /task/update
- * Delete action : GET /task/delete/{id}
+ * List page : GET /key/
+ * Create page : GET /key/create
+ * Create action : POST /key/create
+ * Update page : GET /key/update/{id}
+ * Update action : POST /key/update
+ * Delete action : GET /key/delete/{id}
  *
  * @author calvin
  */
 @Controller
 @RequestMapping(value = "/key")
 public class KeyController {
+
+    private Logger logger = LoggerFactory.getLogger(KeyController.class);
 
     private static final String PAGE_SIZE = "3";
 
@@ -50,7 +50,7 @@ public class KeyController {
     }
 
     @Autowired
-    private TaskService taskService;
+    private KeyTaskService keyTaskService;
 
     @Autowired
     private AccountService accountService;
@@ -72,12 +72,12 @@ public class KeyController {
     }
 
     @RequestMapping(value = "create", method = RequestMethod.GET)
-    public String createForm(Model model, @RequestParam(value = "keyType", defaultValue = "1") String type) {
-        model.addAttribute("keyType", type);
+    public String createForm(Model model, @RequestParam(value = "keyType", defaultValue = "1") String keyType) {
+        model.addAttribute("keyType", keyType);
         model.addAttribute("action", "create");
         User user = accountService.getUser(getCurrentUserId());
         model.addAttribute("user", user);
-        if ("1".equals(type))
+        if ("1".equals(keyType))
             return "key/keyForm";
         else
             return "key/tempKeyForm";
@@ -85,33 +85,44 @@ public class KeyController {
     }
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
-    public String create() {
-		User user = new User(getCurrentUserId());
+    public String create(Model model, @RequestParam("keyType") String keyType) {
+        KeyTask keyTask = new KeyTask();
+        keyTask.setUser(new User(getCurrentUserId()));
+        keyTask.setType(keyType);
+        keyTask.setStatus(KeyTask.APPLYING_STATUS);
+        keyTaskService.saveKeyTask(keyTask);
+        logger.info(keyTask.toString());
 //		newTask.setUser(user);
-//
 //		taskService.saveTask(newTask);
-        getCurrentUserId();
+//        getCurrentUserId();
 //		redirectAttributes.addFlashAttribute("message", "创建任务成功");
-        return "redirect:/key/done.jsp";
+//        taskService.        model.addAttribute("action", "create");
+        model.addAttribute("action", "done");
+        return "key/done";
     }
 
-    @RequestMapping(value = "update/{id}", method = RequestMethod.GET)
-    public String updateForm(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("task", taskService.getTask(id));
-        model.addAttribute("action", "update");
-        return "task/taskForm";
+    @RequestMapping(value = "done", method = RequestMethod.GET)
+    public String done() {
+        return "redirect:/key/";
     }
 
-    @RequestMapping(value = "update", method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute("task") Task task, RedirectAttributes redirectAttributes) {
-        taskService.saveTask(task);
-        redirectAttributes.addFlashAttribute("message", "更新任务成功");
-        return "redirect:/task/";
-    }
+//    @RequestMapping(value = "update/{id}", method = RequestMethod.GET)
+//    public String updateForm(@PathVariable("id") Long id, Model model) {
+//        model.addAttribute("task", keyService.getTask(id));
+//        model.addAttribute("action", "update");
+//        return "task/taskForm";
+//    }
+
+//    @RequestMapping(value = "update", method = RequestMethod.POST)
+//    public String update(@Valid @ModelAttribute("keyTask") KeyTask task, RedirectAttributes redirectAttributes) {
+//        keyService.saveTask(task);
+//        redirectAttributes.addFlashAttribute("message", "更新任务成功");
+//        return "redirect:/task/";
+//    }
 
     @RequestMapping(value = "delete/{id}")
     public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-        taskService.deleteTask(id);
+        keyTaskService.deleteKeyTask(id);
         redirectAttributes.addFlashAttribute("message", "删除任务成功");
         return "redirect:/task/";
     }
@@ -121,9 +132,9 @@ public class KeyController {
      * 因为仅update()方法的form中有id属性，因此仅在update时实际执行.
      */
     @ModelAttribute
-    public void getTask(@RequestParam(value = "id", defaultValue = "-1") Long id, Model model) {
+    public void getKeyTask(@RequestParam(value = "id", defaultValue = "-1") Long id, Model model) {
         if (id != -1) {
-            model.addAttribute("task", taskService.getTask(id));
+            model.addAttribute("task", keyTaskService.getKeyTask(id));
         }
     }
 
