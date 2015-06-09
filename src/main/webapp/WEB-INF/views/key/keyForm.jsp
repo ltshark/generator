@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="control-group">
-            <label for="department" class="control-label">姓名:</label>
+            <label for="department" class="control-label">部门:</label>
             <div class="controls">
                 <label id="department" class="control-label-text-left">${user.name}</label>
             </div>

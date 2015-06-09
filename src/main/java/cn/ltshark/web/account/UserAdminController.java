@@ -5,10 +5,12 @@
  *******************************************************************************/
 package cn.ltshark.web.account;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import cn.ltshark.entity.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,6 +46,7 @@ public class UserAdminController {
 	@RequestMapping(value = "update/{id}", method = RequestMethod.GET)
 	public String updateForm(@PathVariable("id") Long id, Model model) {
 		model.addAttribute("user", accountService.getUser(id));
+		model.addAttribute("action", "update");
 		return "account/adminUserForm";
 	}
 
@@ -59,6 +62,21 @@ public class UserAdminController {
 		User user = accountService.getUser(id);
 		accountService.deleteUser(id);
 		redirectAttributes.addFlashAttribute("message", "删除用户" + user.getLoginName() + "成功");
+		return "redirect:/admin/user";
+	}
+
+	@RequestMapping(value = "create", method = RequestMethod.GET)
+	public String createForm(Model model) {
+		model.addAttribute("user", new User());
+		model.addAttribute("action", "create");
+		return "account/adminUserForm";
+	}
+
+	@RequestMapping(value = "create", method = RequestMethod.POST)
+	public String create(@Valid User newUser, RedirectAttributes redirectAttributes) {
+		newUser.setRegisterDate(new Date());
+		accountService.updateUser(newUser);
+		redirectAttributes.addFlashAttribute("message", "创建用户成功");
 		return "redirect:/admin/user";
 	}
 

@@ -28,5 +28,7 @@
 		</c:forEach>
 		</tbody>
 	</table>
+
+	<div><a class="btn" href="${ctx}/admin/user/create">创建用户</a></div>
 </body>
 </html>
