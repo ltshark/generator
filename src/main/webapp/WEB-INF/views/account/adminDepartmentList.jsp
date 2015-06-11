@@ -6,7 +6,7 @@
 
 <html>
 <head>
-	<title>用户管理</title>
+	<title>部门管理</title>
 </head>
 
 <body>
@@ -24,12 +24,11 @@
 	</div>
 	
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
-		<thead><tr><th>登录名</th><th>用户名</th><th>角色</th><th>注册时间</th><th>管理</th></tr></thead>
+		<thead><tr><th>部门名称</th><th>部门管理员</th><th>管理</th></tr></thead>
 		<tbody>
-		<c:forEach items="${users.content}" var="department">
+		<c:forEach items="${departments.content}" var="department">
 			<tr>
-				<td><a href="${ctx}/admin/user/update/${department.id}">${department.loginName}</a></td>
-				<td>${department.name}</td>
+				<td><a href="${ctx}/admin/user/update/${department.id}">${department.name}</a></td>
 				<td>${department.roles}</td>
 				<td>
 					<fmt:formatDate value="${department.registerDate}" pattern="yyyy年MM月dd日  HH时mm分ss秒" />
@@ -41,6 +40,6 @@
 	</table>
 	<tags:pagination page="${users}" paginationSize="5"/>
 
-	<div><a class="btn" href="${ctx}/admin/user/create">创建用户</a></div>
+	<div><a class="btn" href="${ctx}/admin/user/create">创建部门</a></div>
 </body>
 </html>

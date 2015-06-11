@@ -8,9 +8,7 @@ package cn.ltshark.entity;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -30,6 +28,7 @@ public class User extends IdEntity {
 	private String salt;
 	private String roles;
 	private Date registerDate;
+	private Department department;
 
 	public User() {
 	}
@@ -106,6 +105,16 @@ public class User extends IdEntity {
 
 	public void setRegisterDate(Date registerDate) {
 		this.registerDate = registerDate;
+	}
+
+	@ManyToOne
+	@JoinColumn(name = "department_id")
+	public Department getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(Department department) {
+		this.department = department;
 	}
 
 	@Override

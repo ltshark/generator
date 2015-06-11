@@ -39,7 +39,10 @@ import org.springside.modules.web.Servlets;
 public class UserAdminController {
 
 	private static Map<String, String> sortTypes = Maps.newLinkedHashMap();
-
+	static {
+		sortTypes.put("auto", "自动");
+		sortTypes.put("name", "用户名");
+	}
 	@Autowired
 	private AccountService accountService;
 
