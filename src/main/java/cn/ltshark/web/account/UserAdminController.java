@@ -7,11 +7,16 @@ package cn.ltshark.web.account;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.ServletRequest;
 import javax.validation.Valid;
 
 import cn.ltshark.entity.Task;
+import cn.ltshark.web.task.TaskController;
+import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import cn.ltshark.entity.User;
 import cn.ltshark.service.account.AccountService;
+import org.springside.modules.web.Servlets;
 
 /**
  * 管理员管理用户的Controller.
@@ -32,13 +38,25 @@ import cn.ltshark.service.account.AccountService;
 @RequestMapping(value = "/admin/user")
 public class UserAdminController {
 
+	private static Map<String, String> sortTypes = Maps.newLinkedHashMap();
+
 	@Autowired
 	private AccountService accountService;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String list(Model model) {
-		List<User> users = accountService.getAllUser();
+	public String list(@RequestParam(value = "page", defaultValue = "1") int pageNumber,
+					   @RequestParam(value = "page.size", defaultValue = TaskController.PAGE_SIZE) int pageSize,
+					   @RequestParam(value = "sortType", defaultValue = "auto") String sortType, Model model,
+					   ServletRequest request) {
+		Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
+
+		Page<User> users = accountService.getUsers(searchParams, pageNumber, pageSize, sortType);
+
 		model.addAttribute("users", users);
+		model.addAttribute("sortType", sortType);
+		model.addAttribute("sortTypes", sortTypes);
+		// 将搜索条件编码成字符串，用于排序，分页的URL
+		model.addAttribute("searchParams", Servlets.encodeParameterStringWithPrefix(searchParams, "search_"));
 
 		return "account/adminUserList";
 	}

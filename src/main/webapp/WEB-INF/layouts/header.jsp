@@ -15,6 +15,7 @@
 				<ul class="dropdown-menu">
 					<shiro:hasRole name="admin">
 						<li><a href="${ctx}/admin/user">用户管理</a></li>
+						<li><a href="${ctx}/admin/department">部门管理</a></li>
 						<li class="divider"></li>
 					</shiro:hasRole>
 					<%--<li><a href="${ctx}/api">APIs</a></li>--%>
