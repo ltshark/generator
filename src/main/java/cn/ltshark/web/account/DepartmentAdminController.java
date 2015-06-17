@@ -41,7 +41,7 @@ public class DepartmentAdminController {
 
         Page<Department> Departments = departmentService.getDepartments(searchParams, pageNumber, pageSize, sortType);
 
-        model.addAttribute("Departments", Departments);
+        model.addAttribute("departments", Departments);
         model.addAttribute("sortType", sortType);
         model.addAttribute("sortTypes", sortTypes);
         // 将搜索条件编码成字符串，用于排序，分页的URL
@@ -50,27 +50,27 @@ public class DepartmentAdminController {
         return "account/adminDepartmentList";
     }
 
-//    @RequestMapping(value = "update/{id}", method = RequestMethod.GET)
-//    public String updateForm(@PathVariable("id") Long id, Model model) {
-//        model.addAttribute("Department", departmentService.getDepartment(id));
-//        model.addAttribute("action", "update");
-//        return "account/adminDepartmentForm";
-//    }
-//
-//    @RequestMapping(value = "update", method = RequestMethod.POST)
-//    public String update(@Valid @ModelAttribute("Department") Department Department, RedirectAttributes redirectAttributes) {
-//        departmentService.updateDepartment(Department);
-//        redirectAttributes.addFlashAttribute("message", "更新用户" + Department.getLoginName() + "成功");
-//        return "redirect:/admin/Department";
-//    }
-//
-//    @RequestMapping(value = "delete/{id}")
-//    public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-//        Department Department = departmentService.getDepartment(id);
-//        departmentService.deleteDepartment(id);
-//        redirectAttributes.addFlashAttribute("message", "删除用户" + Department.getLoginName() + "成功");
-//        return "redirect:/admin/Department";
-//    }
+    @RequestMapping(value = "update/{id}", method = RequestMethod.GET)
+    public String updateForm(@PathVariable("id") Long id, Model model) {
+        model.addAttribute("department", departmentService.getDepartment(id));
+        model.addAttribute("action", "update");
+        return "account/adminDepartmentForm";
+    }
+
+    @RequestMapping(value = "update", method = RequestMethod.POST)
+    public String update(@Valid @ModelAttribute("department") Department department, RedirectAttributes redirectAttributes) {
+        departmentService.updateDepartment(department);
+        redirectAttributes.addFlashAttribute("message", "更新用户" + department.getName() + "成功");
+        return "redirect:/admin/department";
+    }
+
+    @RequestMapping(value = "delete/{id}")
+    public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        Department department = departmentService.getDepartment(id);
+        departmentService.deleteDepartment(id);
+        redirectAttributes.addFlashAttribute("message", "删除用户" + department.getName() + "成功");
+        return "redirect:/admin/department";
+    }
 
     @RequestMapping(value = "create", method = RequestMethod.GET)
     public String createForm(Model model) {
@@ -84,7 +84,7 @@ public class DepartmentAdminController {
         newDepartment.setCreateTime(new Date());
         departmentService.updateDepartment(newDepartment);
         redirectAttributes.addFlashAttribute("message", "创建部门成功");
-        return "redirect:/admin/Department";
+        return "redirect:/admin/department";
     }
 
     /**
@@ -94,7 +94,7 @@ public class DepartmentAdminController {
     @ModelAttribute
     public void getDepartment(@RequestParam(value = "id", defaultValue = "-1") Long id, Model model) {
         if (id != -1) {
-            model.addAttribute("Department", departmentService.getDepartment(id));
+            model.addAttribute("department", departmentService.getDepartment(id));
         }
     }
 }

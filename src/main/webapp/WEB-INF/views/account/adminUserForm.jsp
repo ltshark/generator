@@ -43,11 +43,22 @@
 					<span class="help-inline" style="padding:5px 0px"><fmt:formatDate value="${user.registerDate}" pattern="yyyy年MM月dd日  HH时mm分ss秒" /></span>
 				</div>
 			</div>
-			<div class="control-group" <c:if test="${not empty user.id}"> style="display:none"</c:if>>
+			<div class="control-group">
 				<label class="control-label">角色:</label>
 				<div class="controls">
 					<%--<input type="text" id="roles" name="roles" class="input-large required" />--%>
-					<select id="roles" name="roles">
+					<select id="roles" name="roles" <shiro:hasRole name="admin"> disabled=""</shiro:hasRole>>
+						<option value="user" selected>用户</option>
+						<%--<option value="admin">超级管理员</option>--%>
+						<option value="departmentAdmin" >部门管理员</option>
+					</select>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">角色:</label>
+				<div class="controls">
+					<%--<input type="text" id="roles" name="roles" class="input-large required" />--%>
+					<select id="roles" name="roles"  <shiro:hasRole name="admin"> disabled=""</shiro:hasRole>>
 						<option value="user" selected>用户</option>
 						<%--<option value="admin">超级管理员</option>--%>
 						<option value="departmentAdmin" >部门管理员</option>

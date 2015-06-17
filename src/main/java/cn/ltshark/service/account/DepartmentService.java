@@ -68,4 +68,8 @@ public class DepartmentService {
     public void updateDepartment(Department newDepartment) {
         departmentDao.save(newDepartment);
     }
+
+    public void deleteDepartment(Long id) {
+        departmentDao.delete(id);
+    }
 }

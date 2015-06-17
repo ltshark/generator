@@ -24,22 +24,21 @@
 	</div>
 	
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
-		<thead><tr><th>部门名称</th><th>部门管理员</th><th>管理</th></tr></thead>
+		<thead><tr><th>部门名称</th><th>创建时间</th><th>管理</th></tr></thead>
 		<tbody>
 		<c:forEach items="${departments.content}" var="department">
 			<tr>
-				<td><a href="${ctx}/admin/user/update/${department.id}">${department.name}</a></td>
-				<td>${department.roles}</td>
+				<td><a href="${ctx}/admin/department/update/${department.id}">${department.name}</a></td>
 				<td>
-					<fmt:formatDate value="${department.registerDate}" pattern="yyyy年MM月dd日  HH时mm分ss秒" />
+					<fmt:formatDate value="${department.createTime}" pattern="yyyy年MM月dd日  HH时mm分ss秒" />
 				</td>
-				<td><a href="${ctx}/admin/user/delete/${department.id}">删除</a></td>
+				<td><a href="${ctx}/admin/department/delete/${department.id}">删除</a></td>
 			</tr>
 		</c:forEach>
 		</tbody>
 	</table>
-	<tags:pagination page="${users}" paginationSize="5"/>
+	<tags:pagination page="${departments}" paginationSize="5"/>
 
-	<div><a class="btn" href="${ctx}/admin/user/create">创建部门</a></div>
+	<div><a class="btn" href="${ctx}/admin/department/create">创建部门</a></div>
 </body>
 </html>
