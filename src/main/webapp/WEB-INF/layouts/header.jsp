@@ -13,11 +13,15 @@
 				</a>
 			
 				<ul class="dropdown-menu">
-					<shiro:hasAnyRoles name="admin,departmentAdmin">
+					<shiro:hasRole name="admin">
 						<li><a href="${ctx}/admin/user">用户管理</a></li>
 						<li><a href="${ctx}/admin/department">部门管理</a></li>
 						<li class="divider"></li>
-					</shiro:hasAnyRoles>
+					</shiro:hasRole>
+					<shiro:hasRole name="departmentAdmin">
+						<li><a href="${ctx}/admin/user">用户管理</a></li>
+						<li class="divider"></li>
+					</shiro:hasRole>
 					<%--<li><a href="${ctx}/api">APIs</a></li>--%>
 					<li><a href="${ctx}/profile">密码修改</a></li>
 					<li><a href="${ctx}/logout">登出</a></li>

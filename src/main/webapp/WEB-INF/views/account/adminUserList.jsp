@@ -26,15 +26,15 @@
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead><tr><th>登录名</th><th>用户名</th><th>角色</th><th>注册时间</th><th>管理</th></tr></thead>
 		<tbody>
-		<c:forEach items="${users.content}" var="department">
+		<c:forEach items="${users.content}" var="user">
 			<tr>
-				<td><a href="${ctx}/admin/user/update/${department.id}">${department.loginName}</a></td>
-				<td>${department.name}</td>
-				<td>${department.roles}</td>
+				<td><a href="${ctx}/admin/user/update/${user.id}">${user.loginName}</a></td>
+				<td>${user.name}</td>
+				<td>${user.roles}</td>
 				<td>
-					<fmt:formatDate value="${department.registerDate}" pattern="yyyy年MM月dd日  HH时mm分ss秒" />
+					<fmt:formatDate value="${user.registerDate}" pattern="yyyy年MM月dd日  HH时mm分ss秒" />
 				</td>
-				<td><a href="${ctx}/admin/user/delete/${department.id}">删除</a></td>
+				<td><a href="${ctx}/admin/user/delete/${user.id}">删除</a></td>
 			</tr>
 		</c:forEach>
 		</tbody>

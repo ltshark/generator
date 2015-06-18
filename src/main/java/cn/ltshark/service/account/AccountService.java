@@ -89,7 +89,7 @@ public class AccountService {
     }
 
     public Page<User> getUsers(Map<String, Object> searchParams, int pageNumber, int pageSize,
-                                  String sortType) {
+                               String sortType) {
         PageRequest pageRequest = buildPageRequest(pageNumber, pageSize, sortType);
         Specification<User> spec = buildSpecification(searchParams);
 
@@ -127,6 +127,15 @@ public class AccountService {
     }
 
     /**
+     * 判断是否部门管理员.
+     */
+    public boolean isDepartmentAdmin(User user) {
+        if(user==null)
+            return false;
+        return "departmentAdmin".equals(user.getRoles());
+    }
+
+    /**
      * 取出Shiro中的当前用户LoginName.
      */
     private String getCurrentUserName() {
@@ -157,5 +166,11 @@ public class AccountService {
 
     public void setClock(Clock clock) {
         this.clock = clock;
+    }
+
+
+    public User getCurrentUser() {
+        ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
+        return getUser(user.id);
     }
 }

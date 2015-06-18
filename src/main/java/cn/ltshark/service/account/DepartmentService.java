@@ -1,6 +1,7 @@
 package cn.ltshark.service.account;
 
 import cn.ltshark.entity.Department;
+import cn.ltshark.entity.User;
 import cn.ltshark.repository.DepartmentDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springside.modules.persistence.DynamicSpecifications;
 import org.springside.modules.persistence.SearchFilter;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,4 +74,9 @@ public class DepartmentService {
     public void deleteDepartment(Long id) {
         departmentDao.delete(id);
     }
+
+    public List<Department> getAllDepartment() {
+        return (List<Department>) departmentDao.findAll();
+    }
+
 }

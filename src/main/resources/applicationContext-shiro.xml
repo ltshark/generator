@@ -40,7 +40,8 @@
 				/xuan/** = anon
 				<!--/resultServlet/** = anon-->
 				/register/** = anon
-				/admin/** = roleOrFilter["admin,departmentAdmin"]
+				/admin/user/** = roleOrFilter["admin,departmentAdmin"]
+				/admin/department/** = roles[admin]
 				/** = user
 			</value>
 		</property>
