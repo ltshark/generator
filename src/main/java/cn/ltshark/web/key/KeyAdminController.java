@@ -12,9 +12,9 @@ import cn.ltshark.service.account.ShiroDbRealm.ShiroUser;
 import cn.ltshark.service.key.KeyTaskService;
 import cn.ltshark.web.task.TaskController;
 import com.google.common.collect.Maps;
-import org.slf4j.LoggerFactory;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping(value = "/key")
-public class KeyController {
+@RequestMapping(value = "/admin/key")
+public class KeyAdminController {
 
-    private Logger logger = LoggerFactory.getLogger(KeyController.class);
+    private Logger logger = LoggerFactory.getLogger(KeyAdminController.class);
 
     private static final String PAGE_SIZE = "3";
 
@@ -48,50 +48,6 @@ public class KeyController {
 
     @Autowired
     private AccountService accountService;
-
-    @RequestMapping(method = RequestMethod.GET)
-    public String list(ServletRequest request, Model model) {
-        Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
-        searchParams.put("EQ_user.id", String.valueOf(getCurrentUserId()));
-        KeyTask keyTask = keyTaskService.getUserKeyTask(searchParams);
-        boolean canDownload = false;
-        if (keyTask != null && KeyTask.AGREE_APPLY_STATUS.equals(keyTask.getStatus())) {
-            canDownload = true;
-        }
-        model.addAttribute("task", keyTask);
-        model.addAttribute("canDownload", canDownload);
-
-        // 将搜索条件编码成字符串，用于排序，分页的URL
-//		model.addAttribute("searchParams", Servlets.encodeParameterStringWithPrefix(searchParams, "search_"));
-
-        return "key/applyKey";
-    }
-
-    @RequestMapping(value = "create", method = RequestMethod.GET)
-    public String createForm(Model model, @RequestParam(value = "keyType", defaultValue = "1") String keyType) {
-        model.addAttribute("keyType", keyType);
-        model.addAttribute("action", "create");
-        User user = accountService.getUser(getCurrentUserId());
-        model.addAttribute("user", user);
-        if ("1".equals(keyType) || "2".equals(keyType))
-            return "key/keyForm";
-        else
-            return "key/tempKeyForm";
-
-    }
-
-    @RequestMapping(value = "create", method = RequestMethod.POST)
-    public String create(Model model, @RequestParam("keyType") String keyType) {
-        KeyTask keyTask = new KeyTask();
-        keyTask.setUser(new User(getCurrentUserId()));
-        keyTask.setType(keyType);
-        keyTask.setStatus(KeyTask.APPLYING_STATUS);
-        keyTask.setApplyDate(new Date());
-        keyTaskService.saveKeyTask(keyTask);
-        logger.info(keyTask.toString());
-        model.addAttribute("action", "done");
-        return "key/done";
-    }
 
     @RequestMapping(value = "listKeyTask", method = RequestMethod.GET)
     public String listKeyTask(@RequestParam(value = "page", defaultValue = "1") int pageNumber,
@@ -111,11 +67,6 @@ public class KeyController {
         model.addAttribute("searchParams", Servlets.encodeParameterStringWithPrefix(searchParams, "search_"));
 
         return "key/listKeyTask";
-    }
-
-    @RequestMapping(value = "done", method = RequestMethod.GET)
-    public String done() {
-        return "redirect:/key/";
     }
 
     @RequestMapping(value = "approval/{id}", method = RequestMethod.GET)

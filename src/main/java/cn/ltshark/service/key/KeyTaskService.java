@@ -105,6 +105,7 @@ public class KeyTaskService {
             keyTask.setType(keyType);
             keyTask.setStatus(KeyTask.APPLYING_STATUS);
             keyTask.setApplyDate(new Date());
+            keyTasks.add(keyTask);
         }
         if(!keyTasks.isEmpty())
             keyTaskDao.save(keyTasks);
