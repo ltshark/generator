@@ -28,6 +28,8 @@ create table g_key_task (
 	user_id bigint not null,
 	status varchar(32) not null,
 	type varchar(32) not null,
+	apply_date timestamp not null,
+	approval_date timestamp null,
 	primary key (id)
 );
 

@@ -53,6 +53,10 @@ public class UserAdminController {
                        @RequestParam(value = "sortType", defaultValue = "auto") String sortType, Model model,
                        ServletRequest request) {
         Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
+        User currentUser = accountService.getCurrentUser();
+        if(accountService.isDepartmentAdmin(currentUser)){
+            searchParams.put("EQ_department.id",currentUser.getDepartment().getId().toString());
+        }
 
         Page<User> users = accountService.getUsers(searchParams, pageNumber, pageSize, sortType);
 

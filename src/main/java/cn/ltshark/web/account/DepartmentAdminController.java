@@ -60,7 +60,7 @@ public class DepartmentAdminController {
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public String update(@Valid @ModelAttribute("department") Department department, RedirectAttributes redirectAttributes) {
         departmentService.updateDepartment(department);
-        redirectAttributes.addFlashAttribute("message", "更新用户" + department.getName() + "成功");
+        redirectAttributes.addFlashAttribute("message", "更新部门" + department.getName() + "成功");
         return "redirect:/admin/department";
     }
 
@@ -68,7 +68,7 @@ public class DepartmentAdminController {
     public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         Department department = departmentService.getDepartment(id);
         departmentService.deleteDepartment(id);
-        redirectAttributes.addFlashAttribute("message", "删除用户" + department.getName() + "成功");
+        redirectAttributes.addFlashAttribute("message", "删除部门" + department.getName() + "成功");
         return "redirect:/admin/department";
     }
 

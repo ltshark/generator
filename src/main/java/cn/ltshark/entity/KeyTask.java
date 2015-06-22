@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Date;
 
 /**
  * Created by ltshark on 15/6/7.
@@ -15,10 +16,13 @@ import javax.persistence.Table;
 public class KeyTask extends IdEntity {
 
     public static final String APPLYING_STATUS = "1";
-    public static final String APPLYED_STATUS = "2";
+    public static final String AGREE_APPLY_STATUS = "2";
+    public static final String REFUSE_APPLY_STATUS = "3";
     private String type;
     private User user;
     private String status;
+    private Date applyDate;//申请时间
+    private Date approvalDate;//审批时间
 
     public String getType() {
         return type;
@@ -50,5 +54,21 @@ public class KeyTask extends IdEntity {
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
+    }
+
+    public Date getApprovalDate() {
+        return approvalDate;
+    }
+
+    public void setApprovalDate(Date approvalDate) {
+        this.approvalDate = approvalDate;
+    }
+
+    public Date getApplyDate() {
+        return applyDate;
+    }
+
+    public void setApplyDate(Date applyDate) {
+        this.applyDate = applyDate;
     }
 }

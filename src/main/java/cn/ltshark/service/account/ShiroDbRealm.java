@@ -40,7 +40,7 @@ public class ShiroDbRealm extends JndiLdapRealm {
 
     protected AccountService accountService;
     protected String rootDN;
-    private boolean enableLDAP = false;
+    private boolean enableLDAP = true;
 
     /**
      * 认证回调函数,登录时调用.
@@ -87,7 +87,7 @@ public class ShiroDbRealm extends JndiLdapRealm {
             }
         }
         byte[] salt = Encodes.decodeHex(user.getSalt());
-        return new SimpleAuthenticationInfo(new ShiroUser(user.getId(), user.getLoginName(), user.getName()),
+        return new SimpleAuthenticationInfo(new ShiroUser(user.getId(), user.getLoginName(), user.getName(), user.getDepartment().getId()),
                 user.getPassword(), ByteSource.Util.bytes(salt), getName());
 
     }
@@ -167,11 +167,13 @@ public class ShiroDbRealm extends JndiLdapRealm {
         public Long id;
         public String loginName;
         public String name;
+        public Long departmentId;
 
-        public ShiroUser(Long id, String loginName, String name) {
+        public ShiroUser(Long id, String loginName, String name, Long departmentId) {
             this.id = id;
             this.loginName = loginName;
             this.name = name;
+            this.departmentId = departmentId;
         }
 
         public String getName() {

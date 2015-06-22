@@ -19,6 +19,8 @@ import org.springside.modules.persistence.DynamicSpecifications;
 import org.springside.modules.persistence.SearchFilter;
 import org.springside.modules.persistence.SearchFilter.Operator;
 
+import java.security.Key;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,16 +48,16 @@ public class KeyTaskService {
         return (List<KeyTask>) keyTaskDao.findAll();
     }
 
-    public Page<KeyTask> getUserKeyTask(Long userId, Map<String, Object> searchParams, int pageNumber, int pageSize,
-                                        String sortType) {
+    public Page<KeyTask> getKeyTask(Map<String, Object> searchParams, int pageNumber, int pageSize,
+                                    String sortType) {
         PageRequest pageRequest = buildPageRequest(pageNumber, pageSize, sortType);
-        Specification<KeyTask> spec = buildSpecification(userId, searchParams);
+        Specification<KeyTask> spec = buildSpecification(searchParams);
 
         return keyTaskDao.findAll(spec, pageRequest);
     }
 
-    public List<KeyTask> getUserKeyTasks(Long userId, Map<String, Object> searchParams) {
-        Specification<KeyTask> spec = buildSpecification(userId, searchParams);
+    public List<KeyTask> getUserKeyTasks(Map<String, Object> searchParams) {
+        Specification<KeyTask> spec = buildSpecification(searchParams);
         return keyTaskDao.findAll(spec);
     }
 
@@ -76,9 +78,9 @@ public class KeyTaskService {
     /**
      * 创建动态查询条件组合.
      */
-    private Specification<KeyTask> buildSpecification(Long userId, Map<String, Object> searchParams) {
+    private Specification<KeyTask> buildSpecification(Map<String, Object> searchParams) {
         Map<String, SearchFilter> filters = SearchFilter.parse(searchParams);
-        filters.put("user.id", new SearchFilter("user.id", Operator.EQ, userId));
+//        filters.put("user.id", new SearchFilter("user.id", Operator.EQ, userId));
         Specification<KeyTask> spec = DynamicSpecifications.bySearchFilter(filters.values(), KeyTask.class);
         return spec;
     }
@@ -86,5 +88,13 @@ public class KeyTaskService {
     @Autowired
     public void setKeyTaskDao(KeyTaskDao keyTaskDao) {
         this.keyTaskDao = keyTaskDao;
+    }
+
+    public void batchHandle(List<Long> taskIds, String actionType) {
+        List<KeyTask> tasks = (List<KeyTask>) keyTaskDao.findAll(taskIds);
+        for (KeyTask task : tasks) {
+            task.setStatus(actionType);
+        }
+        keyTaskDao.save(tasks);
     }
 }

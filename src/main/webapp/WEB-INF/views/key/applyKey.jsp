@@ -47,13 +47,13 @@
                                 </button>
                             </a>
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <a href="${ctx}/key/create?keyType=1">
+                            <a href="${ctx}/key/create?keyType=2">
                                 <button type="button" name="software" class="btn" style="height:90px;width:110px;"
                                         <c:if test="${fun:length(tasks)>0}">disabled</c:if>>软件证书申请
                                 </button>
                             </a>
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <a href="${ctx}/key/create?keyType=2">
+                            <a href="${ctx}/key/create?keyType=3">
                                 <button type="button" name="temp" class="btn" style="height:90px;width:110px;"
                                         <c:if test="${fun:length(tasks)>0}">disabled</c:if>>临时证书申请
                                 </button>

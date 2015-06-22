@@ -10,13 +10,13 @@ import cn.ltshark.entity.User;
 import cn.ltshark.service.account.AccountService;
 import cn.ltshark.service.account.ShiroDbRealm.ShiroUser;
 import cn.ltshark.service.key.KeyTaskService;
+import cn.ltshark.web.task.TaskController;
 import com.google.common.collect.Maps;
 import org.slf4j.LoggerFactory;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springside.modules.web.Servlets;
 
 import javax.servlet.ServletRequest;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -62,13 +63,12 @@ public class KeyController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String list(ServletRequest request, Model model) {
-        User user = accountService.getUser(getCurrentUserId());
         Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
-        List<KeyTask> keyTasks = keyTaskService.getUserKeyTasks(getCurrentUserId(), searchParams);
-//		Page<Task> tasks = taskService.getUserTask(userId, searchParams, pageNumber, pageSize, sortType);
+        searchParams.put("EQ_user.id", String.valueOf(getCurrentUserId()));
+        List<KeyTask> keyTasks = keyTaskService.getUserKeyTasks(searchParams);
         boolean canDownload = false;
         for (KeyTask task : keyTasks) {
-            if (KeyTask.APPLYED_STATUS.equals(task.getStatus())) {
+            if (KeyTask.AGREE_APPLY_STATUS.equals(task.getStatus())) {
                 canDownload = true;
                 break;
             }
@@ -88,7 +88,7 @@ public class KeyController {
         model.addAttribute("action", "create");
         User user = accountService.getUser(getCurrentUserId());
         model.addAttribute("user", user);
-        if ("1".equals(keyType))
+        if ("1".equals(keyType) || "2".equals(keyType))
             return "key/keyForm";
         else
             return "key/tempKeyForm";
@@ -101,15 +101,31 @@ public class KeyController {
         keyTask.setUser(new User(getCurrentUserId()));
         keyTask.setType(keyType);
         keyTask.setStatus(KeyTask.APPLYING_STATUS);
+        keyTask.setApplyDate(new Date());
         keyTaskService.saveKeyTask(keyTask);
         logger.info(keyTask.toString());
-//		newTask.setUser(user);
-//		taskService.saveTask(newTask);
-//        getCurrentUserId();
-//		redirectAttributes.addFlashAttribute("message", "创建任务成功");
-//        taskService.        model.addAttribute("action", "create");
         model.addAttribute("action", "done");
         return "key/done";
+    }
+
+    @RequestMapping(value = "listTask", method = RequestMethod.GET)
+    public String listTask(@RequestParam(value = "page", defaultValue = "1") int pageNumber,
+                           @RequestParam(value = "page.size", defaultValue = TaskController.PAGE_SIZE) int pageSize,
+                           @RequestParam(value = "sortType", defaultValue = "auto") String sortType,
+                           @RequestParam(value = "taskStatus", defaultValue = KeyTask.APPLYING_STATUS) String taskStatus,
+                           Model model,
+                           ServletRequest request) {
+        Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
+        searchParams.put("EQ_status", taskStatus);
+        Page<KeyTask> keyTasks = keyTaskService.getKeyTask(searchParams, pageNumber, pageSize, sortType);
+        model.addAttribute("tasks", keyTasks);
+        model.addAttribute("sortType", sortType);
+        model.addAttribute("sortTypes", sortTypes);
+        model.addAttribute("taskStatus", taskStatus);
+        // 将搜索条件编码成字符串，用于排序，分页的URL
+        model.addAttribute("searchParams", Servlets.encodeParameterStringWithPrefix(searchParams, "search_"));
+
+        return "key/listTask";
     }
 
     @RequestMapping(value = "done", method = RequestMethod.GET)
@@ -117,12 +133,32 @@ public class KeyController {
         return "redirect:/key/";
     }
 
-//    @RequestMapping(value = "update/{id}", method = RequestMethod.GET)
-//    public String updateForm(@PathVariable("id") Long id, Model model) {
-//        model.addAttribute("task", keyService.getTask(id));
-//        model.addAttribute("action", "update");
-//        return "task/taskForm";
-//    }
+    @RequestMapping(value = "approval/{id}", method = RequestMethod.GET)
+    public String agree(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+        return handleTask(id, redirectAttributes, KeyTask.AGREE_APPLY_STATUS);
+    }
+
+    @RequestMapping(value = "batchHandle", method = RequestMethod.POST)
+//    public String batchHandle(RedirectAttributes redirectAttributes) {
+    public String batchHandle(@RequestParam("taskId") List<Long> taskIds, @RequestParam("actionType") String actionType, RedirectAttributes redirectAttributes) {
+        keyTaskService.batchHandle(taskIds, actionType);
+        redirectAttributes.addFlashAttribute("message", "审批任务完成");
+        return "redirect:/key/listTask?taskStatus=1";
+    }
+
+    private String handleTask(@PathVariable("id") Long id, RedirectAttributes redirectAttributes, String agreeApplyStatus) {
+        KeyTask keyTask = keyTaskService.getKeyTask(id);
+        keyTask.setStatus(agreeApplyStatus);
+        keyTask.setApprovalDate(new Date());
+        keyTaskService.saveKeyTask(keyTask);
+        redirectAttributes.addFlashAttribute("message", "审批任务完成");
+        return "redirect:/key/listTask?taskStatus=1";
+    }
+
+    @RequestMapping(value = "refuse/{id}", method = RequestMethod.GET)
+    public String refuse(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+        return handleTask(id, redirectAttributes, KeyTask.REFUSE_APPLY_STATUS);
+    }
 
 //    @RequestMapping(value = "update", method = RequestMethod.POST)
 //    public String update(@Valid @ModelAttribute("keyTask") KeyTask task, RedirectAttributes redirectAttributes) {

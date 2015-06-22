@@ -3,6 +3,9 @@ package cn.ltshark.service.account;
 import cn.ltshark.entity.Department;
 import cn.ltshark.entity.User;
 import cn.ltshark.repository.DepartmentDao;
+import cn.ltshark.repository.UserDao;
+import cn.ltshark.service.ServiceException;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +75,26 @@ public class DepartmentService {
     }
 
     public void deleteDepartment(Long id) {
+        if (isSupervisor(id)) {
+            logger.warn("操作员{}尝试删除总部", getCurrentUserName());
+            throw new ServiceException("不能删除总部");
+        }
         departmentDao.delete(id);
+//        userDao.delete(id);
+//        taskDao.deleteByUserId(id);
+//        keyTaskDao.deleteByUserId(id);
+    }
+
+    private boolean isSupervisor(Long id) {
+        return id == 1;
+    }
+
+    /**
+     * 取出Shiro中的当前用户LoginName.
+     */
+    private String getCurrentUserName() {
+        ShiroDbRealm.ShiroUser user = (ShiroDbRealm.ShiroUser) SecurityUtils.getSubject().getPrincipal();
+        return user.loginName;
     }
 
     public List<Department> getAllDepartment() {

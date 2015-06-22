@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.ltshark.entity.Task;
+import cn.ltshark.repository.KeyTaskDao;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
@@ -49,6 +50,7 @@ public class AccountService {
 
     private UserDao userDao;
     private TaskDao taskDao;
+    private KeyTaskDao keyTaskDao;
     private Clock clock = Clock.DEFAULT;
 
     public List<User> getAllUser() {
@@ -85,7 +87,7 @@ public class AccountService {
         }
         userDao.delete(id);
         taskDao.deleteByUserId(id);
-
+        keyTaskDao.deleteByUserId(id);
     }
 
     public Page<User> getUsers(Map<String, Object> searchParams, int pageNumber, int pageSize,
@@ -162,6 +164,11 @@ public class AccountService {
     @Autowired
     public void setTaskDao(TaskDao taskDao) {
         this.taskDao = taskDao;
+    }
+
+    @Autowired
+    public void setKeyTaskDao(KeyTaskDao keyTaskDao) {
+        this.keyTaskDao = keyTaskDao;
     }
 
     public void setClock(Clock clock) {
