@@ -6,6 +6,7 @@
 package cn.ltshark.service.key;
 
 import cn.ltshark.entity.KeyTask;
+import cn.ltshark.entity.User;
 import cn.ltshark.repository.KeyTaskDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,9 +21,7 @@ import org.springside.modules.persistence.SearchFilter;
 import org.springside.modules.persistence.SearchFilter.Operator;
 
 import java.security.Key;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 // Spring Bean的标识.
 @Component
@@ -97,4 +96,21 @@ public class KeyTaskService {
         }
         keyTaskDao.save(tasks);
     }
+
+    public void batchApply(List<Long> userIds, String keyType) {
+        List<KeyTask> keyTasks = new ArrayList<KeyTask>();
+        for (Long userid : userIds) {
+            KeyTask keyTask = new KeyTask();
+            keyTask.setUser(new User(userid));
+            keyTask.setType(keyType);
+            keyTask.setStatus(KeyTask.APPLYING_STATUS);
+            keyTask.setApplyDate(new Date());
+        }
+        if(!keyTasks.isEmpty())
+            keyTaskDao.save(keyTasks);
+    }
+
+    public KeyTask getUserKeyTask(Map<String, Object> searchParams) {
+        Specification<KeyTask> spec = buildSpecification(searchParams);
+        return keyTaskDao.findOne(spec);    }
 }

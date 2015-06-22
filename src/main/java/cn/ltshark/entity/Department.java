@@ -33,8 +33,7 @@ public class Department extends IdEntity {
         this.createTime = createTime;
     }
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH,
-            CascadeType.MERGE, CascadeType.REMOVE, CascadeType.ALL}, fetch = FetchType.EAGER, mappedBy = "department")
+    @OneToMany(mappedBy = "department")
     public List<User> getUsers() {
         return users;
     }
@@ -43,8 +42,7 @@ public class Department extends IdEntity {
         this.users = users;
     }
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH,
-            CascadeType.MERGE, CascadeType.REMOVE, CascadeType.ALL}, fetch = FetchType.LAZY, mappedBy = "department")
+    @OneToMany(mappedBy = "department")
     @Where(clause="roles = 'departmentAdmin'")
     public List<User> getAdmins() {
         return admins;

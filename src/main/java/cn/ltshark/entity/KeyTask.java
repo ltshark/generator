@@ -2,10 +2,7 @@ package cn.ltshark.entity;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -33,7 +30,7 @@ public class KeyTask extends IdEntity {
     }
 
     // JPA 基于USER_ID列的多对一关系定义
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
     public User getUser() {
         return user;

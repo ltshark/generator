@@ -85,6 +85,7 @@ public class AccountService {
             logger.warn("操作员{}尝试删除超级管理员用户", getCurrentUserName());
             throw new ServiceException("不能删除超级管理员用户");
         }
+
         userDao.delete(id);
         taskDao.deleteByUserId(id);
         keyTaskDao.deleteByUserId(id);

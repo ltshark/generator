@@ -61,23 +61,33 @@
                         </c:choose>
                     </td>
                     <td><fmt:formatDate value="${task.applyDate}" pattern="yyyy年MM月dd日  HH时mm分ss秒"/></td>
-                    <c:if test="${taskStatus=='1'}">
-                        <td><a href="${ctx}/key/approval/${task.id}">批准</a> &nbsp;&nbsp;<a
-                                href="${ctx}/key/refuse/${task.id}">拒绝</a></td>
-                    </c:if>
+                    <c:choose>
+                        <c:when test="${taskStatus=='1'}">
+                            <td><a href="${ctx}/key/approval/${task.id}">批准</a> &nbsp;&nbsp;<a
+                                    href="${ctx}/key/refuse/${task.id}">拒绝</a></td>
+                        </c:when>
+                        <c:when test="${taskStatus=='2'}">
+                            <td><a href="${ctx}/key/deleteAgree/${task.id}">删除</a></td>
+                        </c:when>
+                        <c:otherwise>
+                            <td><a href="${ctx}/key/deleteRefuse/${task.id}">删除</a></td>
+                        </c:otherwise>
+                    </c:choose>
                 </tr>
             </c:forEach>
             </tbody>
         </table>
         <tags:pagination page="${tasks}" paginationSize="10"/>
-        <div class="form-actions">
-            <select id="actionType" name="actionType">
-                <option value="2">批准</option>
-                <option value="3">拒绝</option>
-            </select>
-            <input id="submit_btn" class="btn btn-primary" type="button" value="审批" onclick="batchHandle();"/>&nbsp;
-            <input id="cancel_btn" class="btn" type="button" value="返回" onclick="history.back()"/>
-        </div>
+        <c:if test="${taskStatus=='1'}">
+            <div class="form-actions">
+                <select id="actionType" name="actionType">
+                    <option value="2">批准</option>
+                    <option value="3">拒绝</option>
+                </select>
+                <input id="submit_btn" class="btn btn-primary" type="button" value="审批" onclick="batchHandle();"/>&nbsp;
+                <input id="cancel_btn" class="btn" type="button" value="返回" onclick="history.back()"/>
+            </div>
+        </c:if>
     </fieldset>
 </form>
 <script>

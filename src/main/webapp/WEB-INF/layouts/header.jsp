@@ -19,16 +19,16 @@
                         <shiro:hasRole name="admin">
                             <li><a href="${ctx}/admin/user">用户管理</a></li>
                             <li><a href="${ctx}/admin/department">部门管理</a></li>
-                            <li><a href="${ctx}/key/listTask?taskStatus=1">待审批申请</a></li>
-                            <li><a href="${ctx}/key/listTask?taskStatus=2">已审批申请</a></li>
-                            <li><a href="${ctx}/key/listTask?taskStatus=3">已拒绝申请</a></li>
+                            <li><a href="${ctx}/key/listKeyTask?taskStatus=1">待审批申请</a></li>
+                            <li><a href="${ctx}/key/listKeyTask?taskStatus=2">已审批申请</a></li>
+                            <li><a href="${ctx}/key/listKeyTask?taskStatus=3">已拒绝申请</a></li>
                             <li class="divider"></li>
                         </shiro:hasRole>
                         <shiro:hasRole name="departmentAdmin">
                             <% if (((ShiroDbRealm.ShiroUser) SecurityUtils.getSubject().getPrincipal()).departmentId == 1) {%>
-                            <li><a href="${ctx}/key/listTask?taskStatus=1">待审批申请</a></li>
-                            <li><a href="${ctx}/key/listTask?taskStatus=2">已审批申请</a></li>
-                            <li><a href="${ctx}/key/listTask?taskStatus=3">已拒绝申请</a></li>
+                            <li><a href="${ctx}/key/listKeyTask?taskStatus=1">待审批申请</a></li>
+                            <li><a href="${ctx}/key/listKeyTask?taskStatus=2">已审批申请</a></li>
+                            <li><a href="${ctx}/key/listKeyTask?taskStatus=3">已拒绝申请</a></li>
                             <li class="divider"></li>
                             <%}%>
                             <li><a href="${ctx}/admin/user">用户管理</a></li>

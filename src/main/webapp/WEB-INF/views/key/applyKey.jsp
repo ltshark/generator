@@ -13,70 +13,70 @@
     </legend>
     <div class="control-group">
         <%--<div class="controls">--%>
-            <table id="contentTable" style="margin-left:100px;">
-                <thead>
-                </thead>
+        <table id="contentTable" style="margin-left:100px;">
+            <thead>
+            </thead>
+            <tr>
+                <td width="200">姓名：</td>
+                <td width="200">电话：</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>部门：</td>
+                <td>固话：</td>
+                <td>email：</td>
+            </tr>
+            <tr>
+                <td>备注：</td>
+            </tr>
+            <tr>
+                <td>证书信息</td>
+            </tr>
+            <tr>
+                <td>
+                    &nbsp;
+                </td>
+            </tr>
+            <%--<div class="control-group">--%>
+            <table style="margin-left:100px;">
                 <tr>
-                    <td width="200">姓名：</td>
-                    <td width="200">电话：</td>
-                    <td>&nbsp;</td>
-                </tr>
-                <tr>
-                    <td>部门：</td>
-                    <td>固话：</td>
-                    <td>email：</td>
-                </tr>
-                <tr>
-                    <td>备注：</td>
-                </tr>
-                <tr>
-                    <td>证书信息</td>
+                    <td>
+                        <a href="${ctx}/key/create?keyType=1">
+                            <button type="button" name="hardware" class="btn" style="height:90px;width:110px;"
+                                    <c:if test="${task != null }">disabled</c:if>>硬件证书申请
+                            </button>
+                        </a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="${ctx}/key/create?keyType=2">
+                            <button type="button" name="software" class="btn" style="height:90px;width:110px;"
+                                    <c:if test="${task != null}">disabled</c:if>>软件证书申请
+                            </button>
+                        </a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="${ctx}/key/create?keyType=3">
+                            <button type="button" name="temp" class="btn" style="height:90px;width:110px;"
+                                    <c:if test="${task != null}">disabled</c:if>>临时证书申请
+                            </button>
+                        </a>
+                    </td>
                 </tr>
                 <tr>
                     <td>
                         &nbsp;
                     </td>
                 </tr>
-                <%--<div class="control-group">--%>
-                <table style="margin-left:100px;">
-                    <tr>
-                        <td>
-                            <a href="${ctx}/key/create?keyType=1">
-                                <button type="button" name="hardware" class="btn" style="height:90px;width:110px;"
-                                        <c:if test="${fun:length(tasks)>0}">disabled</c:if>>硬件证书申请
-                                </button>
-                            </a>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <a href="${ctx}/key/create?keyType=2">
-                                <button type="button" name="software" class="btn" style="height:90px;width:110px;"
-                                        <c:if test="${fun:length(tasks)>0}">disabled</c:if>>软件证书申请
-                                </button>
-                            </a>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <a href="${ctx}/key/create?keyType=3">
-                                <button type="button" name="temp" class="btn" style="height:90px;width:110px;"
-                                        <c:if test="${fun:length(tasks)>0}">disabled</c:if>>临时证书申请
-                                </button>
-                            </a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            &nbsp;
-                        </td>
-                    </tr>
 
-                    <tr>
-                        <td>
-                            <button type="button" name="hardware" class="btn" style="height:35px;width:390px;"
-                                    <c:if test="${not canDownload}">disabled</c:if>>证书下载/证书写入KEY
-                            </button>
-                        </td>
-                    </tr>
-                </table>
-                <%--</div>--%>
-                </tbody>
+                <tr>
+                    <td>
+                        <button type="button" name="hardware" class="btn" style="height:35px;width:390px;"
+                                <c:if test="${not canDownload}">disabled</c:if>>证书下载/证书写入KEY
+                        </button>
+                    </td>
+                </tr>
             </table>
+            <%--</div>--%>
+            </tbody>
+        </table>
         <%--</div>--%>
     </div>
 </fieldset>

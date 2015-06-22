@@ -29,6 +29,7 @@ public class User extends IdEntity {
 	private String roles;
 	private Date registerDate;
 	private Department department;
+    private KeyTask keyTask;
 
 	public User() {
 	}
@@ -117,7 +118,16 @@ public class User extends IdEntity {
 		this.department = department;
 	}
 
-	@Override
+    @OneToOne(mappedBy = "user")
+    public KeyTask getKeyTask() {
+        return keyTask;
+    }
+
+    public void setKeyTask(KeyTask keyTask) {
+        this.keyTask = keyTask;
+    }
+
+    @Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}

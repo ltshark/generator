@@ -55,6 +55,7 @@
 				<!--/resultServlet/** = anon-->
 				/register/** = anon
 				/admin/user/** = roleOrFilter["admin,departmentAdmin"]
+				/key/** = roleOrFilter["admin,departmentAdmin"]
 				/admin/department/** = roles[admin]
 				/** = user
 			</value>
