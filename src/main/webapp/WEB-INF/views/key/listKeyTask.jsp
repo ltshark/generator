@@ -10,7 +10,7 @@
 </head>
 
 <body>
-<form id="inputForm" name="inputForm" action="${ctx}/key/batchHandle" method="post" class="form-horizontal">
+<form id="inputForm" name="inputForm" action="${ctx}/admin/key/batchHandle" method="post" class="form-horizontal">
     <fieldset>
         <legend>
             <small>
@@ -63,14 +63,14 @@
                     <td><fmt:formatDate value="${task.applyDate}" pattern="yyyy年MM月dd日  HH时mm分ss秒"/></td>
                     <c:choose>
                         <c:when test="${taskStatus=='1'}">
-                            <td><a href="${ctx}/key/approval/${task.id}">批准</a> &nbsp;&nbsp;<a
-                                    href="${ctx}/key/refuse/${task.id}">拒绝</a></td>
+                            <td><a href="${ctx}/admin/key/approval/${task.id}">批准</a> &nbsp;&nbsp;<a
+                                    href="${ctx}/admin/key/refuse/${task.id}">拒绝</a></td>
                         </c:when>
                         <c:when test="${taskStatus=='2'}">
-                            <td><a href="${ctx}/key/deleteAgree/${task.id}">删除</a></td>
+                            <td><a href="${ctx}/admin/key/deleteAgree/${task.id}">删除</a></td>
                         </c:when>
                         <c:otherwise>
-                            <td><a href="${ctx}/key/deleteRefuse/${task.id}">删除</a></td>
+                            <td><a href="${ctx}/admin/key/deleteRefuse/${task.id}">删除</a></td>
                         </c:otherwise>
                     </c:choose>
                 </tr>

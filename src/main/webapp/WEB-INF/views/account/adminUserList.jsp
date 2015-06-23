@@ -10,6 +10,10 @@
 </head>
 
 <body>
+<fieldset>
+	<legend>
+		<small>用户管理</small>
+	</legend>
 	<c:if test="${not empty message}">
 		<div id="message" class="alert alert-success"><button data-dismiss="alert" class="close">×</button>${message}</div>
 	</c:if>
@@ -42,5 +46,6 @@
 	<tags:pagination page="${users}" paginationSize="5"/>
 
 	<div><a class="btn" href="${ctx}/admin/user/create">创建用户</a></div>
+	</fieldset>
 </body>
 </html>

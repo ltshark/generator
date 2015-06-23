@@ -78,7 +78,7 @@ public class KeyAdminController {
     public String batchHandle(@RequestParam("taskId") List<Long> taskIds, @RequestParam("actionType") String actionType, RedirectAttributes redirectAttributes) {
         keyTaskService.batchHandle(taskIds, actionType);
         redirectAttributes.addFlashAttribute("message", "审批任务完成");
-        return "redirect:/key/listKeyTask?taskStatus=1";
+        return "redirect:/admin/key/listKeyTask?taskStatus=1";
     }
 
     @RequestMapping(value = "listUserKeyTask", method = RequestMethod.GET)
@@ -93,6 +93,8 @@ public class KeyAdminController {
         }
         Page<User> users = accountService.getUsers(searchParams, pageNumber, pageSize, sortType);
         model.addAttribute("users", users);
+        model.addAttribute("sortType", sortType);
+        model.addAttribute("sortTypes", sortTypes);
         return "key/listUserKeyTask";
     }
 
@@ -100,7 +102,7 @@ public class KeyAdminController {
     public String batchApply(@RequestParam("userId") List<Long> userIds, @RequestParam("keyType") String keyType, RedirectAttributes redirectAttributes) {
         keyTaskService.batchApply(userIds, keyType);
         redirectAttributes.addFlashAttribute("message", "申请证书完成");
-        return "redirect:/key/listUserKeyTask";
+        return "redirect:/admin/key/listUserKeyTask";
     }
 
     private String handleTask(@PathVariable("id") Long id, RedirectAttributes redirectAttributes, String agreeApplyStatus) {
@@ -109,7 +111,7 @@ public class KeyAdminController {
         keyTask.setApprovalDate(new Date());
         keyTaskService.saveKeyTask(keyTask);
         redirectAttributes.addFlashAttribute("message", "审批任务完成");
-        return "redirect:/key/listKeyTask?taskStatus=1";
+        return "redirect:/admin/key/listKeyTask?taskStatus=1";
     }
 
     @RequestMapping(value = "refuse/{id}", method = RequestMethod.GET)
@@ -128,14 +130,14 @@ public class KeyAdminController {
     public String deleteAgree(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         keyTaskService.deleteKeyTask(id);
         redirectAttributes.addFlashAttribute("message", "删除申请成功");
-        return "redirect:/key/listKeyTask?taskStatus=2";
+        return "redirect:/admin/key/listKeyTask?taskStatus=2";
     }
 
     @RequestMapping(value = "deleteRefuse/{id}")
     public String deleteRefuse(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         keyTaskService.deleteKeyTask(id);
         redirectAttributes.addFlashAttribute("message", "删除申请成功");
-        return "redirect:/key/listKeyTask?taskStatus=3";
+        return "redirect:/admin/key/listKeyTask?taskStatus=3";
     }
 
     /**

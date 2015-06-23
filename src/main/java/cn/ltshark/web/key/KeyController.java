@@ -93,98 +93,9 @@ public class KeyController {
         return "key/done";
     }
 
-    @RequestMapping(value = "listKeyTask", method = RequestMethod.GET)
-    public String listKeyTask(@RequestParam(value = "page", defaultValue = "1") int pageNumber,
-                              @RequestParam(value = "page.size", defaultValue = TaskController.PAGE_SIZE) int pageSize,
-                              @RequestParam(value = "sortType", defaultValue = "auto") String sortType,
-                              @RequestParam(value = "taskStatus", defaultValue = KeyTask.APPLYING_STATUS) String taskStatus,
-                              Model model,
-                              ServletRequest request) {
-        Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
-        searchParams.put("EQ_status", taskStatus);
-        Page<KeyTask> keyTasks = keyTaskService.getKeyTask(searchParams, pageNumber, pageSize, sortType);
-        model.addAttribute("tasks", keyTasks);
-        model.addAttribute("sortType", sortType);
-        model.addAttribute("sortTypes", sortTypes);
-        model.addAttribute("taskStatus", taskStatus);
-        // 将搜索条件编码成字符串，用于排序，分页的URL
-        model.addAttribute("searchParams", Servlets.encodeParameterStringWithPrefix(searchParams, "search_"));
-
-        return "key/listKeyTask";
-    }
-
     @RequestMapping(value = "done", method = RequestMethod.GET)
     public String done() {
         return "redirect:/key/";
-    }
-
-    @RequestMapping(value = "approval/{id}", method = RequestMethod.GET)
-    public String agree(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-        return handleTask(id, redirectAttributes, KeyTask.AGREE_APPLY_STATUS);
-    }
-
-    @RequestMapping(value = "batchHandle", method = RequestMethod.POST)
-    public String batchHandle(@RequestParam("taskId") List<Long> taskIds, @RequestParam("actionType") String actionType, RedirectAttributes redirectAttributes) {
-        keyTaskService.batchHandle(taskIds, actionType);
-        redirectAttributes.addFlashAttribute("message", "审批任务完成");
-        return "redirect:/key/listKeyTask?taskStatus=1";
-    }
-
-    @RequestMapping(value = "listUserKeyTask", method = RequestMethod.GET)
-    public String listUserKeyTask(@RequestParam(value = "page", defaultValue = "1") int pageNumber,
-                                  @RequestParam(value = "page.size", defaultValue = TaskController.PAGE_SIZE) int pageSize,
-                                  @RequestParam(value = "sortType", defaultValue = "auto") String sortType, Model model,
-                                  ServletRequest request) {
-        Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
-        User currentUser = accountService.getCurrentUser();
-        if (accountService.isDepartmentAdmin(currentUser)) {
-            searchParams.put("EQ_department.id", currentUser.getDepartment().getId().toString());
-        }
-        Page<User> users = accountService.getUsers(searchParams, pageNumber, pageSize, sortType);
-        model.addAttribute("users", users);
-        return "key/listUserKeyTask";
-    }
-
-    @RequestMapping(value = "batchApply", method = RequestMethod.POST)
-    public String batchApply(@RequestParam("userId") List<Long> userIds, @RequestParam("keyType") String keyType, RedirectAttributes redirectAttributes) {
-        keyTaskService.batchApply(userIds, keyType);
-        redirectAttributes.addFlashAttribute("message", "申请证书完成");
-        return "redirect:/key/listUserKeyTask";
-    }
-
-    private String handleTask(@PathVariable("id") Long id, RedirectAttributes redirectAttributes, String agreeApplyStatus) {
-        KeyTask keyTask = keyTaskService.getKeyTask(id);
-        keyTask.setStatus(agreeApplyStatus);
-        keyTask.setApprovalDate(new Date());
-        keyTaskService.saveKeyTask(keyTask);
-        redirectAttributes.addFlashAttribute("message", "审批任务完成");
-        return "redirect:/key/listKeyTask?taskStatus=1";
-    }
-
-    @RequestMapping(value = "refuse/{id}", method = RequestMethod.GET)
-    public String refuse(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-        return handleTask(id, redirectAttributes, KeyTask.REFUSE_APPLY_STATUS);
-    }
-
-//    @RequestMapping(value = "update", method = RequestMethod.POST)
-//    public String update(@Valid @ModelAttribute("keyTask") KeyTask task, RedirectAttributes redirectAttributes) {
-//        keyService.saveTask(task);
-//        redirectAttributes.addFlashAttribute("message", "更新任务成功");
-//        return "redirect:/task/";
-//    }
-
-    @RequestMapping(value = "deleteAgree/{id}")
-    public String deleteAgree(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-        keyTaskService.deleteKeyTask(id);
-        redirectAttributes.addFlashAttribute("message", "删除申请成功");
-        return "redirect:/key/listKeyTask?taskStatus=2";
-    }
-
-    @RequestMapping(value = "deleteRefuse/{id}")
-    public String deleteRefuse(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-        keyTaskService.deleteKeyTask(id);
-        redirectAttributes.addFlashAttribute("message", "删除申请成功");
-        return "redirect:/key/listKeyTask?taskStatus=3";
     }
 
     /**

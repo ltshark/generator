@@ -10,27 +10,27 @@
 </head>
 
 <body>
-<form id="inputForm" name="inputForm" action="${ctx}/key/batchApply" method="post" class="form-horizontal">
-    <fieldset>
-        <legend>
-            <small>批量申请证书管理</small>
-        </legend>
-        <c:if test="${not empty message}">
-            <div id="message" class="alert alert-success">
-                <button data-dismiss="alert" class="close">×</button>
-                    ${message}</div>
-        </c:if>
-        <%--<div class="row">--%>
-        <%--<div class="span4 offset6">--%>
-        <%--<form class="form-search" action="#">--%>
-        <%--<label>用户名称：</label> <input type="text" name="search_LIKE_name" class="input-medium"--%>
-        <%--value="${param.search_LIKE_name}">--%>
-        <%--<button type="submit" class="btn" id="search_btn">Search</button>--%>
-        <%--</form>--%>
-        <%--</div>--%>
-        <%--<tags:sort/>--%>
-        <%--</div>--%>
 
+<fieldset>
+    <legend>
+        <small>批量申请证书管理</small>
+    </legend>
+    <c:if test="${not empty message}">
+        <div id="message" class="alert alert-success">
+            <button data-dismiss="alert" class="close">×</button>
+                ${message}</div>
+    </c:if>
+    <div class="row">
+        <div class="span4 offset7">
+            <form class="form-search" action="#">
+                <label>用户名：</label><input type="text" name="search_LIKE_name" class="input-medium"
+                                          value="${param.search_LIKE_name}">
+                <button type="submit" class="btn" id="search_btn">Search</button>
+            </form>
+        </div>
+        <tags:sort/>
+    </div>
+    <form id="inputForm" name="inputForm" action="${ctx}/admin/key/batchApply" method="post" class="form-horizontal">
         <table id="contentTable" class="table table-striped table-bordered table-condensed">
             <thead>
             <tr>
@@ -43,7 +43,8 @@
             <tbody>
             <c:forEach items="${users.content}" var="user">
                 <tr>
-                    <td><input id="userId" name="userId" type="checkbox" value="${user.id}" <c:if test="${user.keyTask!=null}">disabled</c:if>></td>
+                    <td><input id="userId" name="userId" type="checkbox" value="${user.id}"
+                               <c:if test="${user.keyTask!=null}">disabled</c:if>></td>
                     <td>${user.name}</td>
                     <td>${user.department.name}</td>
                     <td><c:choose>
@@ -66,8 +67,9 @@
             <input id="submit_btn" class="btn btn-primary" type="button" value="申请证书" onclick="batchHandle();"/>&nbsp;
             <input id="cancel_btn" class="btn" type="button" value="返回" onclick="history.back()"/>
         </div>
-    </fieldset>
-</form>
+    </form>
+</fieldset>
+
 <script>
     function batchHandle() {
         if (isChecked(document.inputForm, "userId")) {
