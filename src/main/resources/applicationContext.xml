@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context" xmlns:jdbc="http://www.springframework.org/schema/jdbc"  
-	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
-	   xmlns:ldap="http://www.springframework.org/schema/ldap"
-	   xsi:schemaLocation="
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:ldap="http://www.springframework.org/schema/ldap"
+       xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
 		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
@@ -12,201 +13,172 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
 		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd
 		http://www.springframework.org/schema/ldap http://www.springframework.org/schema/ldap/spring-ldap.xsd"
-	default-lazy-init="true">
+       default-lazy-init="true">
 
-	<description>Spring公共配置 </description>
+    <description>Spring公共配置</description>
 
-	<!-- 使用annotation 自动注册bean, 并保证@Required、@Autowired的属性被注入 -->
-	<context:component-scan base-package="cn.ltshark">
-		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
-		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
-	</context:component-scan>
-	<!-- Jpa Entity Manager 配置 -->
-	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"> 
-		<property name="dataSource" ref="dataSource"/>
-		<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
-		<property name="packagesToScan" value="cn.ltshark"/>
-		<property name="jpaProperties">
-			<props>
-				<!-- 命名规则 My_NAME->MyName -->
-				<prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
-			</props>
-		</property>
-	</bean>
-	
-	<bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-		<property name="databasePlatform">
-			<bean factory-method="getDialect" class="org.springside.modules.persistence.Hibernates">
-				<constructor-arg ref="dataSource"/>
-			</bean>
-		</property>
-	</bean>
+    <!--<context:annotation-config />-->
 
-	<!-- Spring Data Jpa配置 -->
- 	<jpa:repositories base-package="cn.ltshark"  transaction-manager-ref="transactionManager" entity-manager-factory-ref="entityManagerFactory"/>
-   
-	<!-- Jpa 事务配置 -->
-	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-		<property name="entityManagerFactory" ref="entityManagerFactory"/>
-	</bean>
+    <!-- 使用annotation 自动注册bean, 并保证@Required、@Autowired的属性被注入 -->
+    <context:component-scan base-package="cn.ltshark">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    </context:component-scan>
+    <!-- Jpa Entity Manager 配置 -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
+        <property name="packagesToScan" value="cn.ltshark"/>
+        <property name="jpaProperties">
+            <props>
+                <!-- 命名规则 My_NAME->MyName -->
+                <prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+            </props>
+        </property>
+    </bean>
 
-	<!-- 使用annotation定义事务 -->
-	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+    <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="databasePlatform">
+            <bean factory-method="getDialect" class="org.springside.modules.persistence.Hibernates">
+                <constructor-arg ref="dataSource"/>
+            </bean>
+        </property>
+    </bean>
 
-	<!-- JSR303 Validator定义 -->
- 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
-	
-	<!--&lt;!&ndash; production环境 &ndash;&gt;-->
- 	<!--<beans profile="production">-->
- 		<!--<context:property-placeholder ignore-unresolvable="true"-->
-			<!--location="classpath*:/application.properties" />	-->
-		<!-- -->
-		<!--&lt;!&ndash; 数据源配置, 使用Tomcat JDBC连接池 &ndash;&gt;-->
-		<!--<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">-->
-			<!--&lt;!&ndash; Connection Info &ndash;&gt;-->
-			<!--<property name="driverClassName" value="${jdbc.driver}" />-->
-			<!--<property name="url" value="${jdbc.url}" />-->
-			<!--<property name="username" value="${jdbc.username}" />-->
-			<!--<property name="password" value="${jdbc.password}" />-->
-		<!-- -->
-			<!--&lt;!&ndash; Connection Pooling Info &ndash;&gt;-->
-			<!--<property name="maxActive" value="${jdbc.pool.maxActive}" />-->
-			<!--<property name="maxIdle" value="${jdbc.pool.maxIdle}" />-->
-			<!--<property name="minIdle" value="0" />-->
-			<!--<property name="defaultAutoCommit" value="false" />-->
-		<!--</bean>-->
-		<!-- -->
-		<!--&lt;!&ndash; 数据源配置,使用应用服务器的数据库连接池 &ndash;&gt;-->
-		<!--&lt;!&ndash;<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/ExampleDB" />&ndash;&gt;-->
-	<!--</beans>-->
-	<!-- -->
-	<!--&lt;!&ndash; local development环境 &ndash;&gt;-->
-	<!--<beans profile="development">-->
-		<!--<context:property-placeholder ignore-resource-not-found="true"-->
-			<!--location="classpath*:/application.properties,-->
-          			  <!--classpath*:/application.development.properties" />	-->
+    <!-- Spring Data Jpa配置 -->
+    <jpa:repositories base-package="cn.ltshark" transaction-manager-ref="transactionManager"
+                      entity-manager-factory-ref="entityManagerFactory"/>
 
-		<!--&lt;!&ndash; Tomcat JDBC连接池 &ndash;&gt;-->
-		<!--<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">-->
-			<!--<property name="driverClassName" value="${jdbc.driver}" />-->
-			<!--<property name="url" value="${jdbc.url}" />-->
-			<!--<property name="username" value="${jdbc.username}" />-->
-			<!--<property name="password" value="${jdbc.password}" />-->
-			<!--<property name="defaultAutoCommit" value="false" />-->
-		<!--</bean>-->
-	<!--</beans>-->
-	<!-- -->
-	<!--&lt;!&ndash; functional test 环境 &ndash;&gt;-->
-	<!--<beans profile="functional">-->
-		<!--<context:property-placeholder ignore-resource-not-found="true"-->
-			<!--location="classpath*:/application.properties,-->
-          			  <!--classpath*:/application.functional.properties,-->
-          			  <!--classpath*:/application.functional-local.properties" />	-->
+    <!-- Jpa 事务配置 -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
 
-		<!--&lt;!&ndash; Tomcat JDBC连接池 &ndash;&gt;-->
-		<!--<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">-->
-			<!--<property name="driverClassName" value="${jdbc.driver}" />-->
-			<!--<property name="url" value="${jdbc.url}" />-->
-			<!--<property name="username" value="${jdbc.username}" />-->
-			<!--<property name="password" value="${jdbc.password}" />-->
-			<!--<property name="defaultAutoCommit" value="false" />-->
-		<!--</bean>-->
+    <!-- 使用annotation定义事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
 
-		<!--&lt;!&ndash; 初始化数据表结构 &ndash;&gt;-->
-		<!--<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">-->
-			<!--<jdbc:script location="classpath:sql/${db.type}/schema.sql" />-->
-		<!--</jdbc:initialize-database>	-->
-	<!--</beans>-->
-	<!-- -->
-	<!--&lt;!&ndash; unit test环境 &ndash;&gt;-->
-	<!--<beans profile="test">-->
-	 	<!--<context:property-placeholder ignore-resource-not-found="true"-->
-			<!--location="classpath*:/application.properties,-->
-          			  <!--classpath*:/application.test.properties" />	-->
-		<!-- -->
-		<!--&lt;!&ndash; Spring Simple连接池 &ndash;&gt;-->
-		<!--<bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">-->
-			<!--<property name="driverClass" value="${jdbc.driver}" />-->
-			<!--<property name="url" value="${jdbc.url}" />-->
-			<!--<property name="username" value="${jdbc.username}" />-->
-			<!--<property name="password" value="${jdbc.password}" />-->
-		<!--</bean>-->
+    <!-- JSR303 Validator定义 -->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
-		<!--&lt;!&ndash; 初始化数据表结构 与默认数据&ndash;&gt;-->
-		<!--<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">-->
-			<!--<jdbc:script location="classpath:sql/h2/schema.sql" />-->
-			<!--<jdbc:script location="classpath:data/h2/import-data.sql" encoding="UTF-8"/>-->
-		<!--</jdbc:initialize-database>-->
-	<!--</beans>-->
+    <!-- local development环境 -->
+    <!--<beans profile="development">-->
+    <context:property-placeholder ignore-resource-not-found="true"
+                                  location="classpath*:/application.properties,
+          			  classpath*:/application.development.properties,classpath*:/ldap.properties"/>
 
-	<!-- LDAP -->
-	<context:property-placeholder location="classpath:/ldap.properties" system-properties-mode="OVERRIDE" />
-	<context:annotation-config />
+    <!-- Tomcat JDBC连接池 -->
+    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="defaultAutoCommit" value="false"/>
+    </bean>
 
-	<ldap:context-source id="contextSource"
-						 password="${sample.ldap.password}"
-						 url="${sample.ldap.url}"
-						 username="${sample.ldap.userDn}"
-						 base="${sample.ldap.base}" />
+    <!-- LDAP -->
 
-	<ldap:ldap-template id="ldapTemplate" context-source-ref="contextSource"/>
+    <ldap:context-source id="contextSource"
+                         password="${sample.ldap.password}"
+                         url="${sample.ldap.url}"
+                         username="${sample.ldap.userDn}"
+                         base="${sample.ldap.base}"/>
 
-	<!--
+    <ldap:ldap-template id="ldapTemplate" context-source-ref="contextSource"/>
+
+    <!--
         This will scan the org.springframework.ldap.samples.useradmin.domain package for interfaces
         extending CrudRepository (in our case, LdapRepository), automatically creating repository
         beans based on these interfaces.
     -->
-	<ldap:repositories base-package="org.springframework.ldap.samples.useradmin.domain" />
+    <ldap:repositories base-package="cn.ltshark.domain"/>
 
-	<!--
+    <!--
         This one will never be referenced directly, but the ldap:repositories tag will make sure
         it will be 'wired in', because the GroupRepo interface extends from an interface that GroupRepoImpl
         imlements.
     -->
-	<bean class="cn.ltshark.domain.impl.GroupRepoImpl" >
-		<constructor-arg ref="ldapTemplate"/>
-	</bean>
 
-	<bean class="cn.ltshark.domain.impl.DepartmentRepoImpl" >
-		<constructor-arg ref="ldapTemplate"/>
-	</bean>
+    <bean class="cn.ltshark.service.account.UserService">
+        <property name="directoryType" value="${sample.ldap.directory.type}"/>
+    </bean>
 
-	<bean class="cn.ltshark.service.UserService">
-		<property name="directoryType" value="${sample.ldap.directory.type}" />
-	</bean>
+    <!-- Required to make sure BaseLdapName is populated in UserService -->
+    <bean class="org.springframework.ldap.core.support.BaseLdapPathBeanPostProcessor"/>
+    <!--</beans>-->
 
-	<!-- Required to make sure BaseLdapName is populated in UserService -->
-	<bean class="org.springframework.ldap.core.support.BaseLdapPathBeanPostProcessor" />
+    <!--&lt;!&ndash; functional test 环境 &ndash;&gt;-->
+    <!--<beans profile="functional">-->
+    <!--<context:property-placeholder ignore-resource-not-found="true"-->
+    <!--location="classpath*:/application.properties,-->
+    <!--classpath*:/application.functional.properties,-->
+    <!--classpath*:/application.functional-local.properties" />	-->
 
-	<beans profile="default">
-		<!-- Populates the LDAP server with initial data -->
-		<bean class="org.springframework.ldap.test.LdifPopulator" depends-on="embeddedLdapServer">
-			<property name="contextSource" ref="contextSource" />
-			<property name="resource" value="classpath:/setup_data.ldif" />
-			<property name="base" value="${sample.ldap.base}" />
-			<property name="clean" value="${sample.ldap.clean}" />
-			<property name="defaultBase" value="dc=example,dc=com" />
-		</bean>
+    <!--&lt;!&ndash; Tomcat JDBC连接池 &ndash;&gt;-->
+    <!--<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">-->
+    <!--<property name="driverClassName" value="${jdbc.driver}" />-->
+    <!--<property name="url" value="${jdbc.url}" />-->
+    <!--<property name="username" value="${jdbc.username}" />-->
+    <!--<property name="password" value="${jdbc.password}" />-->
+    <!--<property name="defaultAutoCommit" value="false" />-->
+    <!--</bean>-->
 
-		<!--
+    <!--&lt;!&ndash; 初始化数据表结构 &ndash;&gt;-->
+    <!--<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">-->
+    <!--<jdbc:script location="classpath:sql/${db.type}/schema.sql" />-->
+    <!--</jdbc:initialize-database>	-->
+    <!--</beans>-->
+    <!-- -->
+    <!--&lt;!&ndash; unit test环境 &ndash;&gt;-->
+    <!--<beans profile="test">-->
+    <!--<context:property-placeholder ignore-resource-not-found="true"-->
+    <!--location="classpath*:/application.properties,-->
+    <!--classpath*:/application.test.properties" />	-->
+    <!-- -->
+    <!--&lt;!&ndash; Spring Simple连接池 &ndash;&gt;-->
+    <!--<bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">-->
+    <!--<property name="driverClass" value="${jdbc.driver}" />-->
+    <!--<property name="url" value="${jdbc.url}" />-->
+    <!--<property name="username" value="${jdbc.username}" />-->
+    <!--<property name="password" value="${jdbc.password}" />-->
+    <!--</bean>-->
+
+    <!--&lt;!&ndash; 初始化数据表结构 与默认数据&ndash;&gt;-->
+    <!--<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">-->
+    <!--<jdbc:script location="classpath:sql/h2/schema.sql" />-->
+    <!--<jdbc:script location="classpath:data/h2/import-data.sql" encoding="UTF-8"/>-->
+    <!--</jdbc:initialize-database>-->
+    <!--</beans>-->
+
+
+    <beans profile="default">
+        <!-- Populates the LDAP server with initial data -->
+        <bean class="org.springframework.ldap.test.LdifPopulator" depends-on="embeddedLdapServer">
+            <property name="contextSource" ref="contextSource"/>
+            <property name="resource" value="classpath:/setup_data.ldif"/>
+            <property name="base" value="${sample.ldap.base}"/>
+            <property name="clean" value="${sample.ldap.clean}"/>
+            <property name="defaultBase" value="dc=example,dc=com"/>
+        </bean>
+
+        <!--
             This is for test and demo purposes only - EmbeddedLdapServerFactoryBean launches an in-process
             LDAP server.
         -->
-		<bean id="embeddedLdapServer" class="org.springframework.ldap.test.EmbeddedLdapServerFactoryBean">
-			<property name="partitionName" value="example"/>
-			<property name="partitionSuffix" value="${sample.ldap.base}" />
-			<property name="port" value="18880" />
-		</bean>
-	</beans>
+        <bean id="embeddedLdapServer" class="org.springframework.ldap.test.EmbeddedLdapServerFactoryBean">
+            <property name="partitionName" value="example"/>
+            <property name="partitionSuffix" value="${sample.ldap.base}"/>
+            <property name="port" value="18880"/>
+        </bean>
+    </beans>
 
-	<beans profile="no-apacheds">
-		<!-- Populates the LDAP server with initial data -->
-		<bean class="org.springframework.ldap.test.LdifPopulator">
-			<property name="contextSource" ref="contextSource" />
-			<property name="resource" value="classpath:/setup_data.ldif" />
-			<property name="base" value="${sample.ldap.base}" />
-			<property name="clean" value="${sample.ldap.clean}" />
-			<property name="defaultBase" value="dc=example,dc=com" />
-		</bean>
-	</beans>
+    <beans profile="no-apacheds">
+        <!-- Populates the LDAP server with initial data -->
+        <bean class="org.springframework.ldap.test.LdifPopulator">
+            <property name="contextSource" ref="contextSource"/>
+            <property name="resource" value="classpath:/setup_data.ldif"/>
+            <property name="base" value="${sample.ldap.base}"/>
+            <property name="clean" value="${sample.ldap.clean}"/>
+            <property name="defaultBase" value="dc=example,dc=com"/>
+        </bean>
+    </beans>
 </beans>

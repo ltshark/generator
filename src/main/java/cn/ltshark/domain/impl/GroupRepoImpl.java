@@ -24,6 +24,7 @@ import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.BaseLdapNameAware;
 import org.springframework.ldap.query.LdapQuery;
 import org.springframework.ldap.support.LdapUtils;
+import org.springframework.stereotype.Component;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
@@ -35,6 +36,7 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
 /**
  * @author Mattias Hellborg Arthursson
  */
+@Component
 public class GroupRepoImpl implements GroupRepoExtension, BaseLdapNameAware {
     private final static LdapName ADMIN_USER = LdapUtils.newLdapName("cn=System,ou=System,ou=IT,ou=Departments");
 

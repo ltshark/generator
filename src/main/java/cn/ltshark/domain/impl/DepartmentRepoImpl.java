@@ -22,6 +22,7 @@ import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.NameClassPairMapper;
 import org.springframework.ldap.support.LdapNameBuilder;
 import org.springframework.ldap.support.LdapUtils;
+import org.springframework.stereotype.Component;
 
 import javax.naming.NameClassPair;
 import javax.naming.NamingException;
@@ -33,6 +34,7 @@ import java.util.Map;
 /**
  * @author Mattias Hellborg Arthursson
  */
+@Component
 public class DepartmentRepoImpl implements DepartmentRepo {
 
     private static final LdapName DEPARTMENTS_OU = LdapUtils.newLdapName("ou=Departments");
