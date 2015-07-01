@@ -33,12 +33,14 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 import java.io.Serializable;
+import java.util.List;
 
 public class ShiroDbRealm extends JndiLdapRealm {
 
     private static final Logger log = LoggerFactory.getLogger(ShiroDbRealm.class);
 
     protected AccountService accountService;
+    protected UserService userService;
     protected String rootDN;
     private boolean enableLDAP = true;
 
@@ -57,6 +59,8 @@ public class ShiroDbRealm extends JndiLdapRealm {
             throw new CaptchaException("验证码错误");
         }
 
+        List<cn.ltshark.domain.User> userList = (List<cn.ltshark.domain.User>)userService.findAll();
+        log.info(userList.toString());
         User user = accountService.findUserByLoginName(token.getUsername());
         if (user == null) {
             return null;
@@ -157,6 +161,10 @@ public class ShiroDbRealm extends JndiLdapRealm {
 
     public void setEnableLDAP(boolean enableLDAP) {
         this.enableLDAP = enableLDAP;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     /**

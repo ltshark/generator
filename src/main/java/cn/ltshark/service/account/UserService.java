@@ -21,9 +21,18 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.ldap.core.ContextMapper;
+import org.springframework.ldap.core.DirContextOperations;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.AbstractContextMapper;
 import org.springframework.ldap.core.support.BaseLdapNameAware;
+import org.springframework.ldap.query.LdapQuery;
+import org.springframework.ldap.query.LdapQueryBuilder;
 import org.springframework.ldap.support.LdapNameBuilder;
 import org.springframework.ldap.support.LdapUtils;
+import org.springframework.stereotype.Component;
 
 import javax.naming.Name;
 import javax.naming.ldap.LdapName;
@@ -31,14 +40,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import static org.springframework.ldap.query.LdapQueryBuilder.query;
+
 /**
  * @author Mattias Hellborg Arthursson
  */
+@Component
 public class UserService implements BaseLdapNameAware {
     private final UserRepo userRepo;
     private final GroupRepo groupRepo;
     private LdapName baseLdapPath;
     private DirectoryType directoryType;
+    private LdapTemplate ldapTemplate;
 
     @Autowired
     public UserService(UserRepo userRepo, GroupRepo groupRepo) {
@@ -60,7 +73,26 @@ public class UserService implements BaseLdapNameAware {
     }
 
     public Iterable<User> findAll() {
+        LdapQueryBuilder query1 = query();
+//        query1.attributes("memberOf");
+        LdapQuery query = (LdapQuery) query1
+                .where("objectCategory").is("person").and("objectClass").is("user");
+        for(User user : (List<User>)ldapTemplate.search(query, getContextMapper()))
+            System.out.println(user.getFullName());
         return userRepo.findAll();
+    }
+    protected ContextMapper getContextMapper() {
+        return new PersonContextMapper();
+    }
+
+
+    private static class PersonContextMapper extends AbstractContextMapper<User> {
+        public User doMapFromContext(DirContextOperations context) {
+            User person = new User();
+            person.setFullName(context.getStringAttribute("cn"));
+            person.setLastName(context.getStringAttribute("sn"));
+            return person;
+        }
     }
 
     public User findUser(String userId) {
@@ -189,5 +221,16 @@ public class UserService implements BaseLdapNameAware {
 
     public List<User> searchByNameName(String lastName) {
         return userRepo.findByFullNameContains(lastName);
+    }
+
+    @Autowired
+    public void setLdapTemplate(LdapTemplate ldapTemplate) {
+        this.ldapTemplate = ldapTemplate;
+    }
+
+    public static void main(String[] args) {
+        ApplicationContext applicationContext = new FileSystemXmlApplicationContext("classpath*:/applicationContext.xml");
+        UserService userService = (UserService)applicationContext.getBean("userService");
+        userService.findAll();
     }
 }
