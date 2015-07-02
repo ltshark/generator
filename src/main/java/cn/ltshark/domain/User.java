@@ -16,6 +16,7 @@
 
 package cn.ltshark.domain;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.ldap.odm.annotations.*;
 import org.springframework.ldap.support.LdapUtils;
 
@@ -24,13 +25,13 @@ import javax.naming.Name;
 /**
  * @author Mattias Hellborg Arthursson
  */
-@Entry(objectClasses = { "inetOrgPerson", "organizationalPerson", "person", "top" }, base = "ou=Departments")
+@Entry(objectClasses = { "user", "organizationalPerson", "person", "top" })
 public final class User {
     @Id
     private Name id;
 
     @Attribute(name = "cn")
-    @DnAttribute(value="cn", index=3)
+//    @DnAttribute(value="cn", index=3)
     private String fullName;
 
     @Attribute(name = "employeeNumber")
@@ -51,11 +52,11 @@ public final class User {
     @Attribute(name = "telephoneNumber")
     private String phone;
 
-    @DnAttribute(value="ou", index=2)
+    @DnAttribute(value = "ou", index = 1)
     @Transient
     private String unit;
 
-    @DnAttribute(value="ou", index=1)
+    @DnAttribute(value = "ou", index = 0)
     @Transient
     private String department;
 
@@ -158,5 +159,10 @@ public final class User {
     @Override
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

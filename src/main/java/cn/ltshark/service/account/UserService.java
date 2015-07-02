@@ -77,9 +77,16 @@ public class UserService implements BaseLdapNameAware {
 //        query1.attributes("memberOf");
         LdapQuery query = (LdapQuery) query1
                 .where("objectCategory").is("person").and("objectClass").is("user");
-        for(User user : (List<User>)ldapTemplate.search(query, getContextMapper()))
-            System.out.println(user.getFullName());
-        return userRepo.findAll();
+//                .where("objectClass").is("user");
+        for(User user : (List<User>)ldapTemplate.search(query1, getContextMapper()))
+            System.out.println(user);
+        System.out.println("---------------------");
+        Iterable<User> all = userRepo.findAll(query);
+        for(User user : (List<User>)all){
+            System.out.println(user);
+
+        }
+        return all;
     }
     protected ContextMapper getContextMapper() {
         return new PersonContextMapper();
