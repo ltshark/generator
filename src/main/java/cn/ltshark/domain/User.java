@@ -25,7 +25,7 @@ import javax.naming.Name;
 /**
  * @author Mattias Hellborg Arthursson
  */
-@Entry(objectClasses = { "user", "organizationalPerson", "person", "top" })
+@Entry(objectClasses = {"user", "organizationalPerson", "person", "top"})
 public final class User {
     @Id
     private Name id;
@@ -52,21 +52,26 @@ public final class User {
     @Attribute(name = "telephoneNumber")
     private String phone;
 
-    @DnAttribute(value = "ou", index = 1)
-    @Transient
-    private String unit;
+//    @DnAttribute(value = "ou", index = 0)
+//    @Transient
+//    private String unit;
 
-    @DnAttribute(value = "ou", index = 0)
-    @Transient
+    @Attribute(name = "department")
     private String department;
 
-    public String getUnit() {
-        return unit;
-    }
+    @Attribute(name = "userprincipalname")
+    private String userPrincipalName;
 
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
+    @Attribute(name = "samaccountname")
+    private String samAccountName;
+//
+//    public String getUnit() {
+//        return unit;
+//    }
+//
+//    public void setUnit(String unit) {
+//        this.unit = unit;
+//    }
 
     public String getDepartment() {
         return department;
@@ -142,6 +147,22 @@ public final class User {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getUserPrincipalName() {
+        return userPrincipalName;
+    }
+
+    public void setUserPrincipalName(String userPrincipalName) {
+        this.userPrincipalName = userPrincipalName;
+    }
+
+    public String getSamAccountName() {
+        return samAccountName;
+    }
+
+    public void setSamAccountName(String samAccountName) {
+        this.samAccountName = samAccountName;
     }
 
     @Override

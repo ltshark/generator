@@ -59,7 +59,8 @@ public class ShiroDbRealm extends JndiLdapRealm {
             throw new CaptchaException("验证码错误");
         }
 
-        List<cn.ltshark.domain.User> userList = (List<cn.ltshark.domain.User>)userService.findAll();
+//        List<cn.ltshark.domain.User> userList = (List<cn.ltshark.domain.User>)userService.findAll();
+        cn.ltshark.domain.User userList = userService.findUser(token.getUsername());
         log.info(userList.toString());
         User user = accountService.findUserByLoginName(token.getUsername());
         if (user == null) {
