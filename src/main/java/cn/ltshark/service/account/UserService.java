@@ -86,6 +86,7 @@ public class UserService implements BaseLdapNameAware {
         for (User user : (List<User>) all) {
             System.out.println(user);
         }
+//      samaccountname
         return all;
     }
 
@@ -309,19 +310,19 @@ public class UserService implements BaseLdapNameAware {
         String adminName = "cn=administrator,cn=users,DC=yaic,DC=com,DC=cn";
 
         String adminpassword = "Yf821010";
-        String userName = "CN=qware4（快威4）,OU=users,DC=yaic,DC=com,DC=cn";
+        String userName = "CN=qware4（快威4）,CN=users,DC=yaic,DC=com,DC=cn";
         //old password Ab123456
-        String newPassword = "yaic32";
-        String keystore = "/Users/ltshark/Downloads/test.keystore";
+        String newPassword = "yaic32@";
+        String keystore = "C:\\Program Files\\Java\\jdk1.7.0_45\\jre\\lib\\security\\cacerts2";
         //   String keystore = "E:/project/iam/testADlhj.keystore";
         System.setProperty("javax.net.ssl.trustStore", keystore);
-        System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
         env.put(Context.SECURITY_PRINCIPAL, adminName);
         env.put(Context.SECURITY_CREDENTIALS, adminpassword);
         env.put(Context.SECURITY_PROTOCOL, "ssl");
-        String ldapURL = "ldap://172.16.104.184:636";
+        String ldapURL = "ldap://192.168.134.129:636";
         env.put(Context.PROVIDER_URL, ldapURL);
         try {
             LdapContext ctx = new InitialLdapContext(env, null);
@@ -368,7 +369,7 @@ public class UserService implements BaseLdapNameAware {
 //        Name qware4 = userService.getUserIdByLoginName("qware4");
 //        userService.modifyPassword(qware4, "yaic32");
         userService.m();
-        ok = userService.authenticate("qware4", "yaic32");
+        ok = userService.authenticate("qware4", "yaic32@");
         System.out.println(ok);
 
     }
