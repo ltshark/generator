@@ -40,15 +40,16 @@ public class OpAD {
 
     private LdapContext ctx = null;
 
-    private String adminName = "administrator@yaic.com.cn";
+//    private String adminName = "Administrator@yaic.com.cn";
 
+    private String adminName = "cn=Administrator,cn=users,DC=yaic,DC=com,DC=cn";
     private String adminpassword = "Yf821010";
 
-    private String keystore = "/Users/ltshark/Downloads/test.keystore";
+    private String keystore = "C:\\Program Files\\Java\\jdk1.7.0_45\\jre\\lib\\security\\cacerts2";
 
-    private String keyPassword = "123456";
+    private String keyPassword = "changeit";
 
-    private String ldapURL = "ldaps://172.16.104.186:636";//ip:port
+    private String ldapURL = "ldaps://192.168.134.129:636";//ip:port
 
     private String searchBase = "DC=yaic,DC=com,DC=cn";
 
@@ -59,6 +60,7 @@ public class OpAD {
         Hashtable env = new Hashtable();
         System.setProperty("javax.net.ssl.trustStore", keystore);
         System.setProperty("javax.net.ssl.trustStorePassword", keyPassword);
+//        System.setProperty("javax.net.debug", "SSL,handshake");
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
         env.put(Context.SECURITY_PRINCIPAL, adminName);

@@ -16,16 +16,16 @@ import java.util.Properties;
 public class LdapsTest {
     public static void main(String[] args) {
         Properties env = new Properties();
-//        String adminName = "administrator@yaic.com.cn";//username@domain
-        String adminName = "cn=administrator,cn=users,DC=yaic,DC=com,DC=cn";
+        String adminName = "administrator@yaic.com.cn";//username@domain
+//        String adminName = "cn=Administrator,cn=users,DC=yaic,DC=com,DC=cn";
         String adminPassword = "Yf821010";//password
-        String ldapURL = "LDAP://172.16.104.186:636";//ip:port
-        String keystore = "/Users/ltshark/Downloads/test.keystore";
+        String ldapURL = "LDAP://192.168.134.129";//ip:port
+        String keystore = "C:\\Program Files\\Java\\jdk1.7.0_45\\jre\\lib\\security\\cacerts2";
 //        String keystore = "/Library/Java/JavaVirtualMachines/jdk1.7.0_75.jdk/Contents/Home/jre/lib/security/test.keystore";
         //   String keystore = "E:/project/iam/testADlhj.keystore";
         System.setProperty("javax.net.ssl.trustStore", keystore);
-        System.setProperty("javax.net.debug", "debug");
-        System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+//        System.setProperty("javax.net.debug", "SSL,handshake");
+        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
         env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_PROTOCOL,"ssl");
 //        env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"

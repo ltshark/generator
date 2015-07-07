@@ -18,7 +18,7 @@ public class LdapTest {
         Properties env = new Properties();
         String adminName = "administrator@yaic.com.cn";//username@domain
         String adminPassword = "Yf821010";//password
-        String ldapURL = "LDAP://172.16.104.156:389";//ip:port
+        String ldapURL = "LDAP://192.168.134.129:389";//ip:port
         env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
 //        env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
         env.put(Context.SECURITY_PRINCIPAL, adminName);
