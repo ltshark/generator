@@ -1,4 +1,4 @@
-package cn.ltshark.service.account;
+package cn.ltshark.domain;
 
 /**
  * Active Derictory 中的用户信息

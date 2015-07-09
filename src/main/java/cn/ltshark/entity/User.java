@@ -1,134 +1,191 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2014 springside.github.io
+/*
+ * Copyright 2005-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
- *******************************************************************************/
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.ltshark.entity;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.*;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.ldap.odm.annotations.Attribute;
+import org.springframework.ldap.odm.annotations.Entry;
+import org.springframework.ldap.odm.annotations.Id;
+import org.springframework.ldap.support.LdapUtils;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.ImmutableList;
+import javax.naming.Name;
 
-@Entity
-@Table(name = "g_user")
-public class User extends IdEntity {
-	private String loginName;
-	private String name;
-	private String plainPassword;
-	private String password;
-	private String salt;
-	private String roles;
-	private Date registerDate;
-	private Department department;
-    private KeyTask keyTask;
+/**
+ * @author Mattias Hellborg Arthursson
+ */
+@Entry(objectClasses = {"user", "organizationalPerson", "person", "top"})
+public final class User {
+    @Id
+    private Name id;
 
-	public User() {
-	}
+    @Attribute(name = "cn")
+//    @DnAttribute(value="cn", index=3)
+    private String fullName;
 
-	public User(Long id) {
-		this.id = id;
-	}
+    @Attribute(name = "employeeNumber")
+    private int employeeNumber;
 
-	@NotBlank
-	public String getLoginName() {
-		return loginName;
-	}
+    @Attribute(name = "givenName")
+    private String firstName;
 
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
-	}
+    @Attribute(name = "sn")
+    private String lastName;
 
-	@NotBlank
-	public String getName() {
-		return name;
-	}
+    @Attribute(name = "title")
+    private String title;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    @Attribute(name = "mail")
+    private String email;
 
-	// 不持久化到数据库，也不显示在Restful接口的属性.
-	@Transient
-	@JsonIgnore
-	public String getPlainPassword() {
-		return plainPassword;
-	}
+    @Attribute(name = "telephoneNumber")
+    private String phone;
 
-	public void setPlainPassword(String plainPassword) {
-		this.plainPassword = plainPassword;
-	}
+//    @DnAttribute(value = "ou", index = 0)
+//    @Transient
+//    private String unit;
 
-	public String getPassword() {
-		return password;
-	}
+    @Attribute(name = "department")
+    private String department;
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    @Attribute(name = "userprincipalname")
+    private String userPrincipalName;
 
-	public String getSalt() {
-		return salt;
-	}
+    @Attribute(name = "samaccountname")
+    private String samAccountName;
+//
+//    public String getUnit() {
+//        return unit;
+//    }
+//
+//    public void setUnit(String unit) {
+//        this.unit = unit;
+//    }
 
-	public void setSalt(String salt) {
-		this.salt = salt;
-	}
-
-	public String getRoles() {
-		return roles;
-	}
-
-	public void setRoles(String roles) {
-		this.roles = roles;
-	}
-
-	@Transient
-	@JsonIgnore
-	public List<String> getRoleList() {
-		// 角色列表在数据库中实际以逗号分隔字符串存储，因此返回不能修改的List.
-		return ImmutableList.copyOf(StringUtils.split(roles, ","));
-	}
-
-	// 设定JSON序列化时的日期格式
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
-	public Date getRegisterDate() {
-		return registerDate;
-	}
-
-	public void setRegisterDate(Date registerDate) {
-		this.registerDate = registerDate;
-	}
-
-	@ManyToOne
-	@JoinColumn(name = "department_id")
-	public Department getDepartment() {
-		return department;
-	}
-
-	public void setDepartment(Department department) {
-		this.department = department;
-	}
-
-    @OneToOne(mappedBy = "user")
-    public KeyTask getKeyTask() {
-        return keyTask;
+    public String getDepartment() {
+        return department;
     }
 
-    public void setKeyTask(KeyTask keyTask) {
-        this.keyTask = keyTask;
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public Name getId() {
+        return id;
+    }
+
+    public void setId(Name id) {
+        this.id = id;
+    }
+
+    public void setId(String id) {
+        this.id = LdapUtils.newLdapName(id);
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public int getEmployeeNumber() {
+        return employeeNumber;
+    }
+
+    public void setEmployeeNumber(int employeeNumber) {
+        this.employeeNumber = employeeNumber;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getUserPrincipalName() {
+        return userPrincipalName;
+    }
+
+    public void setUserPrincipalName(String userPrincipalName) {
+        this.userPrincipalName = userPrincipalName;
+    }
+
+    public String getSamAccountName() {
+        return samAccountName;
+    }
+
+    public void setSamAccountName(String samAccountName) {
+        this.samAccountName = samAccountName;
     }
 
     @Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
-	}
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        if (id != null ? !id.equals(user.id) : user.id != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
 }

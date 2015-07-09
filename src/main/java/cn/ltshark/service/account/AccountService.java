@@ -8,8 +8,8 @@ package cn.ltshark.service.account;
 import java.util.List;
 import java.util.Map;
 
-import cn.ltshark.entity.Task;
 import cn.ltshark.repository.KeyTaskDao;
+import cn.ltshark.repository.UserDao;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
@@ -22,8 +22,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import cn.ltshark.entity.User;
-import cn.ltshark.repository.TaskDao;
-import cn.ltshark.repository.UserDao;
 import cn.ltshark.service.ServiceException;
 import cn.ltshark.service.account.ShiroDbRealm.ShiroUser;
 import org.springside.modules.persistence.DynamicSpecifications;
@@ -49,7 +47,6 @@ public class AccountService {
     private static Logger logger = LoggerFactory.getLogger(AccountService.class);
 
     private UserDao userDao;
-    private TaskDao taskDao;
     private KeyTaskDao keyTaskDao;
     private Clock clock = Clock.DEFAULT;
 
@@ -65,30 +62,11 @@ public class AccountService {
         return userDao.findByLoginName(loginName);
     }
 
-    public void registerUser(User user) {
-        entryptPassword(user);
-        user.setRoles("user");
-        user.setRegisterDate(clock.getCurrentDate());
-
-        userDao.save(user);
-    }
-
     public void updateUser(User user) {
         if (StringUtils.isNotBlank(user.getPlainPassword())) {
             entryptPassword(user);
         }
         userDao.save(user);
-    }
-
-    public void deleteUser(Long id) {
-        if (isSupervisor(id)) {
-            logger.warn("操作员{}尝试删除超级管理员用户", getCurrentUserName());
-            throw new ServiceException("不能删除超级管理员用户");
-        }
-
-        userDao.delete(id);
-        taskDao.deleteByUserId(id);
-        keyTaskDao.deleteByUserId(id);
     }
 
     public Page<User> getUsers(Map<String, Object> searchParams, int pageNumber, int pageSize,

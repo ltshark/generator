@@ -20,12 +20,12 @@ import java.util.Date;
  * @author ltshark
  */
 public class GenX509Cert {
-    private static final String ROOT_PFX = "/data/generator/key/YAICDC01.pfx";
-    private static final String USER_TEMP_CER = "/data/generator/key/ss.cer";
+    private static final String ROOT_PFX = GlobalConfig.ROOT_PATH + "key/YAICDC01.pfx";
+    private static final String USER_TEMP_CER = GlobalConfig.ROOT_PATH + "key/ss.cer";
     private static String UPNOID = "1.3.6.1.4.1.311.20.2.3";
     private static final String ROOT_KEY_PASSWORD = "1234";
 
-    private static final String USER_KEY_STORE_PATH = "/data/generator/key/user/";
+    private static final String USER_KEY_STORE_PATH = GlobalConfig.ROOT_PATH + "key/user/";
     //用户模板证书
     private static X509Certificate userTempCertificate;
 
@@ -61,7 +61,7 @@ public class GenX509Cert {
         X509CertImpl x509certimpl = new X509CertImpl(certbytes);
         X509CertInfo x509certinfo = (X509CertInfo) x509certimpl.get("x509.info");
         x509certinfo.set("key", new CertificateX509Key(clientKeypair.getPublic()));
-        X500Name subject = new X500Name("CN=" + user.getName() + ", OU=Network, OU=YAIC, DC=yaic, DC=com, DC=cn");
+        X500Name subject = new X500Name("CN=" + user.getFullName() + ", OU=Network, OU=YAIC, DC=yaic, DC=com, DC=cn");
         x509certinfo.set("subject.dname", subject);
         Date bdate = new Date();
         Date edate = new Date();
@@ -72,24 +72,24 @@ public class GenX509Cert {
         CertificateExtensions exts = (CertificateExtensions) x509certinfo.get(X509CertInfo.EXTENSIONS);
         GeneralNames generalNames = new GeneralNames();
         ObjectIdentifier upnoid = new ObjectIdentifier(UPNOID);
-        generalNames.add(new GeneralName(new OtherName(upnoid, getUTF8String(user.getName() + "@yaic.com.cn"))));
+        generalNames.add(new GeneralName(new OtherName(upnoid, getUTF8String(user.getFullName() + "@yaic.com.cn"))));
         SubjectAlternativeNameExtension subjectAlternativeNameExtension = new SubjectAlternativeNameExtension(false, generalNames);
         //更改用户备用名
         exts.set("SubjectAlternativeName", subjectAlternativeNameExtension);
         //更改私钥指纹信息
         exts.set("SubjectKeyIdentifier", new SubjectKeyIdentifierExtension(new KeyIdentifier(clientKeypair.getPublic()).getIdentifier()));
         x509certinfo.set(X509CertInfo.EXTENSIONS, exts);
-        x509certinfo.set("serialNumber", new CertificateSerialNumber(user.getId().intValue()));
+        x509certinfo.set("serialNumber", new CertificateSerialNumber(user.getId().hashCode()));
 
         X509CertImpl x509certimpl1 = new X509CertImpl(x509certinfo);
         x509certimpl1.sign(rootPrivKey, "SHA1withRSA");
         BASE64Encoder base64 = new BASE64Encoder();
-        FileOutputStream fos = new FileOutputStream(new File(USER_KEY_STORE_PATH, user.getName() + ".crt"));
+        FileOutputStream fos = new FileOutputStream(new File(USER_KEY_STORE_PATH, user.getFullName() + ".crt"));
         base64.encodeBuffer(x509certimpl1.getEncoded(), fos);
 
         Certificate[] certChain = {x509certimpl1};
-        File pfxPath = new File(USER_KEY_STORE_PATH, user.getName() + ".pfx");
-        savePfx(user.getName(), clientKeypair.getPrivate(), ROOT_KEY_PASSWORD, certChain, pfxPath);
+        File pfxPath = new File(USER_KEY_STORE_PATH, user.getFullName() + ".pfx");
+        savePfx(user.getFullName(), clientKeypair.getPrivate(), ROOT_KEY_PASSWORD, certChain, pfxPath);
 
 //        FileInputStream in = new FileInputStream(pfxPath);
 //        KeyStore inputKeyStore = KeyStore.getInstance("pkcs12");
@@ -97,7 +97,7 @@ public class GenX509Cert {
 //        Certificate cert = inputKeyStore.getCertificate("22222222");
 //        System.out.print(cert.getPublicKey());
 //        PrivateKey privk = (PrivateKey) inputKeyStore.getKey("22222222", ROOT_KEY_PASSWORD.toCharArray());
-//        FileOutputStream privKfos = new FileOutputStream(new File(USER_KEY_STORE_PATH, user.getName() + ".pvk"));
+//        FileOutputStream privKfos = new FileOutputStream(new File(USER_KEY_STORE_PATH, user.getFullName() + ".pvk"));
 //        privKfos.write(privk.getEncoded());
 //        System.out.print(privk);
 //        in.close();
@@ -180,8 +180,8 @@ public class GenX509Cert {
 
         try {
             User user = new User();
-            user.setName("22222222");
-            user.setId(22222222L);
+            user.setFullName("22222222");
+//            user.setId(22222222L);
             GenX509Cert.signUserPfxCert(user);
         } catch (Exception e) {
             // TODO Auto-generated catch block

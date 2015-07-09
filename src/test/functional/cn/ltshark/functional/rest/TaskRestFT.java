@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import cn.ltshark.data.TaskData;
-import cn.ltshark.entity.Task;
 import cn.ltshark.functional.BaseFunctionalTestCase;
 import org.springside.modules.mapper.JsonMapper;
 import org.springside.modules.test.category.Smoke;

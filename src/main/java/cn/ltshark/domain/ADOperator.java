@@ -1,4 +1,4 @@
-package cn.ltshark.service.account;
+package cn.ltshark.domain;
 
 import java.util.Hashtable;
 import java.util.Properties;

@@ -12,7 +12,6 @@ import org.junit.experimental.categories.Category;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import cn.ltshark.data.TaskData;
-import cn.ltshark.entity.Task;
 import cn.ltshark.functional.BaseSeleniumTestCase;
 import org.springside.modules.test.category.Smoke;
 

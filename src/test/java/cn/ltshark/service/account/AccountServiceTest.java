@@ -17,8 +17,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import cn.ltshark.data.UserData;
 import cn.ltshark.entity.User;
-import cn.ltshark.repository.TaskDao;
-import cn.ltshark.repository.UserDao;
 import cn.ltshark.service.ServiceException;
 import cn.ltshark.service.account.ShiroDbRealm.ShiroUser;
 import org.springside.modules.test.security.shiro.ShiroTestUtils;

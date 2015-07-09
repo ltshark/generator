@@ -17,6 +17,8 @@
 package cn.ltshark.service.account;
 
 import cn.ltshark.domain.*;
+import cn.ltshark.entity.User;
+import cn.ltshark.repository.UserDao;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -52,15 +54,15 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
  */
 @Component
 public class UserService implements BaseLdapNameAware {
-    private final UserRepo userRepo;
+    private final UserDao userDao;
     private final GroupRepo groupRepo;
     private LdapName baseLdapPath;
     private DirectoryType directoryType;
     private LdapTemplate ldapTemplate;
 
     @Autowired
-    public UserService(UserRepo userRepo, GroupRepo groupRepo) {
-        this.userRepo = userRepo;
+    public UserService(UserDao userDao, GroupRepo groupRepo) {
+        this.userDao = userDao;
         this.groupRepo = groupRepo;
     }
 
@@ -82,7 +84,7 @@ public class UserService implements BaseLdapNameAware {
         for (User user : (List<User>) ldapTemplate.search(query, getContextMapper()))
             System.out.println(user);
         System.out.println("---------------------");
-        Iterable<User> all = userRepo.findAll(query);
+        Iterable<User> all = userDao.findAll(query);
         for (User user : (List<User>) all) {
             System.out.println(user);
         }
@@ -115,16 +117,16 @@ public class UserService implements BaseLdapNameAware {
 
     public User findUser(String userId) {
         LdapName id = LdapUtils.newLdapName(userId);
-        return userRepo.findOne(id);
+        return userDao.findOne(id);
     }
 
     public User findUser(Name userId) {
         LdapName id = LdapUtils.newLdapName(userId);
-        return userRepo.findOne(id);
+        return userDao.findOne(id);
     }
 
     public User createUser(User user) {
-        User savedUser = userRepo.save(user);
+        User savedUser = userDao.save(user);
 
         Group userGroup = getUserGroup();
 
@@ -149,7 +151,7 @@ public class UserService implements BaseLdapNameAware {
      * @return
      */
     public Set<User> findAllMembers(Iterable<Name> absoluteIds) {
-        return Sets.newLinkedHashSet(userRepo.findAll(toRelativeIds(absoluteIds)));
+        return Sets.newLinkedHashSet(userDao.findAll(toRelativeIds(absoluteIds)));
     }
 
     public Iterable<Name> toRelativeIds(Iterable<Name> absoluteIds) {
@@ -163,7 +165,7 @@ public class UserService implements BaseLdapNameAware {
 
     public User updateUser(Name userId, User user) {
         LdapName originalId = LdapUtils.newLdapName(userId);
-        User existingUser = userRepo.findOne(originalId);
+        User existingUser = userDao.findOne(originalId);
 
         existingUser.setFirstName(user.getFirstName());
         existingUser.setLastName(user.getLastName());
@@ -191,7 +193,7 @@ public class UserService implements BaseLdapNameAware {
      * @return the updated entry
      */
     private User updateUserStandard(LdapName originalId, User existingUser) {
-        User savedUser = userRepo.save(existingUser);
+        User savedUser = userDao.save(existingUser);
 
         if (!originalId.equals(savedUser.getId())) {
             // The user has moved - we need to update group references.
@@ -223,7 +225,7 @@ public class UserService implements BaseLdapNameAware {
         LdapName oldMemberDn = toAbsoluteDn(originalId);
         Collection<Group> groups = groupRepo.findByMember(oldMemberDn);
 
-        User savedUser = userRepo.save(existingUser);
+        User savedUser = userDao.save(existingUser);
         LdapName newMemberDn = toAbsoluteDn(savedUser.getId());
 
         if (!originalId.equals(savedUser.getId())) {
@@ -341,7 +343,7 @@ public class UserService implements BaseLdapNameAware {
     }
 
     public List<User> searchByNameName(String lastName) {
-        return userRepo.findByFullNameContains(lastName);
+        return userDao.findByFullNameContains(lastName);
     }
 
     @Autowired

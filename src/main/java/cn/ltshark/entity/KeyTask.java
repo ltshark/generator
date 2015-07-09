@@ -8,9 +8,7 @@ import java.util.Date;
 /**
  * Created by ltshark on 15/6/7.
  */
-@Entity
-@Table(name = "g_key_task")
-public class KeyTask extends IdEntity {
+public class KeyTask {
 
     public static final String APPLYING_STATUS = "1";
     public static final String AGREE_APPLY_STATUS = "2";
@@ -29,9 +27,6 @@ public class KeyTask extends IdEntity {
         this.type = type;
     }
 
-    // JPA 基于USER_ID列的多对一关系定义
-    @OneToOne
-    @JoinColumn(name = "user_id")
     public User getUser() {
         return user;
     }

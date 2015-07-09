@@ -42,14 +42,14 @@ public class OpAD {
 
 //    private String adminName = "Administrator@yaic.com.cn";
 
-    private String adminName = "cn=Administrator,cn=users,DC=yaic,DC=com,DC=cn";
+    private String adminName = "Administrator@yaic.com.cn";
     private String adminpassword = "Yf821010";
 
-    private String keystore = "C:\\Program Files\\Java\\jdk1.7.0_45\\jre\\lib\\security\\cacerts2";
+    private String keystore = "/Library/Java/JavaVirtualMachines/jdk1.7.0_75.jdk/Contents/Home/jre/lib/security/cacerts1";
 
     private String keyPassword = "changeit";
 
-    private String ldapURL = "ldaps://192.168.134.129:636";//ip:port
+    private String ldapURL = "ldap://172.16.104.192:636";//ip:port
 
     private String searchBase = "DC=yaic,DC=com,DC=cn";
 

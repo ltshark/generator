@@ -5,7 +5,6 @@
  *******************************************************************************/
 package cn.ltshark.data;
 
-import cn.ltshark.entity.Task;
 import cn.ltshark.entity.User;
 import org.springside.modules.test.data.RandomData;
 
