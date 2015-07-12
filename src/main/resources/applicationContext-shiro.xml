@@ -12,17 +12,15 @@
 	</bean>
 
 	<bean id="contextFactory" class="org.apache.shiro.realm.ldap.JndiLdapContextFactory">
-		<property name="url" value=""/>
-		<property name="systemUsername" value=""/>
-		<property name="systemPassword" value=""/>
+		<property name="url" value="${sample.ldap.url}"/>
+		<property name="systemUsername" value="${sample.ldap.admin}"/>
+		<property name="systemPassword" value="${sample.ldap.password}"/>
 	</bean>
 	<!-- 項目自定义的Realm, 所有accountService依赖的dao都需要用depends-on声明 -->
 	<bean id="shiroDbRealm" class="cn.ltshark.service.account.ShiroDbRealm">
-		<property name="accountService" ref="accountService"/>
 		<property name="userService" ref="userService"/>
 		<property name="contextFactory" ref="contextFactory"/>
-		<property name="rootDN" value="rootDN"/>
-		<property name="enableLDAP" value="false"/>
+		<property name="rootDN" value="sample.ldap.base"/>
 	</bean>
 
 	<!--ldapRealm = main.java.name.peter.shiro.realm.ldap.LdapAuthenticator-->

@@ -85,10 +85,10 @@
 //    }
 //
 //    @RequestMapping(value = "update", method = RequestMethod.POST)
-//    public String update(@Valid @ModelAttribute("user") User user, @RequestParam(value = "department_id", defaultValue = "-1") Long departmentId, RedirectAttributes redirectAttributes) {
-//        if (departmentId != -1) {
+//    public String update(@Valid @ModelAttribute("user") User user, @RequestParam(value = "department_id", defaultValue = "-1") Long department, RedirectAttributes redirectAttributes) {
+//        if (department != -1) {
 //            Department department = new Department();
-//            department.setId(departmentId);
+//            department.setId(department);
 //            user.setDepartment(department);
 //        }
 //        accountService.updateUser(user);
@@ -113,9 +113,9 @@
 //    }
 //
 //    @RequestMapping(value = "create", method = RequestMethod.POST)
-//    public String create(@Valid User newUser, @RequestParam(value = "department_id") Long departmentId, RedirectAttributes redirectAttributes) {
+//    public String create(@Valid User newUser, @RequestParam(value = "department_id") Long department, RedirectAttributes redirectAttributes) {
 //        Department department = new Department();
-//        department.setId(departmentId);
+//        department.setId(department);
 //        newUser.setDepartment(department);
 //        newUser.setRegisterDate(new Date());
 //        accountService.updateUser(newUser);

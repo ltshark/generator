@@ -9,7 +9,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 /**
  * Created by ltshark on 15/6/7.
  */
-public interface KeyTaskDao extends PagingAndSortingRepository<KeyTask, Long>, JpaSpecificationExecutor<KeyTask> {
+public interface KeyTaskDao {
 
     void deleteByUserId(Long id);
 }

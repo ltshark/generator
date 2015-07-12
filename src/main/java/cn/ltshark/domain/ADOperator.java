@@ -406,7 +406,7 @@ public class ADOperator {
         if (bool) {
             System.out.println("用户存在，准备修改用户。");
             op.modifyUser(info);
-            // op.changePassword(info);
+             op.changePassword(info);
             System.out.println("用户修改成功。");
         } else {
             System.out.println("用户不存在，准备创建用户。");

@@ -18,11 +18,13 @@ package cn.ltshark.entity;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.ldap.odm.annotations.Attribute;
+import org.springframework.ldap.odm.annotations.DnAttribute;
 import org.springframework.ldap.odm.annotations.Entry;
 import org.springframework.ldap.odm.annotations.Id;
 import org.springframework.ldap.support.LdapUtils;
 
 import javax.naming.Name;
+import javax.persistence.Transient;
 
 /**
  * @author Mattias Hellborg Arthursson
@@ -54,6 +56,10 @@ public final class User {
     @Attribute(name = "telephoneNumber")
     private String phone;
 
+    @DnAttribute(value = "cn", index = 0)
+    @Transient
+    private String name;
+
 //    @DnAttribute(value = "ou", index = 0)
 //    @Transient
 //    private String unit;
@@ -66,6 +72,8 @@ public final class User {
 
     @Attribute(name = "samaccountname")
     private String samAccountName;
+    private String plainPassword;
+    private byte[] password;
 //
 //    public String getUnit() {
 //        return unit;
@@ -187,5 +195,29 @@ public final class User {
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
+    }
+
+    public String getPlainPassword() {
+        return plainPassword;
+    }
+
+    public void setPlainPassword(String plainPassword) {
+        this.plainPassword = plainPassword;
+    }
+
+    public void setPassword(byte[] password) {
+        this.password = password;
+    }
+
+    public byte[] getPassword() {
+        return password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
