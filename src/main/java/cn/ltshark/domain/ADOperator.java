@@ -15,8 +15,9 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.ModificationItem;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 
 /**
@@ -26,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ADOperator {
 
-    private static Log log = LogFactory.getLog(ADOperator.class);
+    private static Logger log = LoggerFactory.getLogger(ADOperator.class);
 
     private DirContext ctx;
 

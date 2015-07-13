@@ -15,19 +15,37 @@
 			<div class="control-group">
 				<label for="name" class="control-label">用户名:</label>
 				<div class="controls">
-					<input type="text" id="name" name="name" value="${user.name}" class="input-large required"/>
+					<input type="text" id="name" name="name" value="${user.name}" class="input-large required" disabled/>
 				</div>
 			</div>
 			<div class="control-group">
 				<label for="plainPassword" class="control-label">密码:</label>
 				<div class="controls">
-					<input type="password" id="plainPassword" name="plainPassword" class="input-large" placeholder="...Leave it blank if no change"/>
+					<input type="password" id="plainPassword" name="plainPassword" class="input-large" placeholder="不修改留空"/>
 				</div>
 			</div>
 			<div class="control-group">
 				<label for="confirmPassword" class="control-label">确认密码:</label>
 				<div class="controls">
 					<input type="password" id="confirmPassword" name="confirmPassword" class="input-large" equalTo="#plainPassword" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label for="phone" class="control-label">手机号码:</label>
+				<div class="controls">
+					<input type="text" id="phone" name="phone" value="${user.phone}" class="input-large"/>
+				</div>
+			</div>
+			<div class="control-group">
+				<label for="email" class="control-label">Email:</label>
+				<div class="controls">
+					<input type="text" id="email" name="email" value="${user.email}" class="input-large"/>
+				</div>
+			</div>
+			<div class="control-group">
+				<label for="description" class="control-label">备注:</label>
+				<div class="controls">
+					<input type="text" id="description" name="description" value="${user.description}" class="input-large"/>
 				</div>
 			</div>
 			<div class="form-actions">

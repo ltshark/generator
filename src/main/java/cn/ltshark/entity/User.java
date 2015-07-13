@@ -18,13 +18,12 @@ package cn.ltshark.entity;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.ldap.odm.annotations.Attribute;
-import org.springframework.ldap.odm.annotations.DnAttribute;
 import org.springframework.ldap.odm.annotations.Entry;
 import org.springframework.ldap.odm.annotations.Id;
+import org.springframework.ldap.odm.annotations.Transient;
 import org.springframework.ldap.support.LdapUtils;
 
 import javax.naming.Name;
-import javax.persistence.Transient;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -32,7 +31,7 @@ import java.io.UnsupportedEncodingException;
  */
 @Entry(objectClasses = {"user", "organizationalPerson", "person", "top"})
 public final class User {
-    @Id
+    @Id()
     private Name id;
 
     @Attribute(name = "cn")
@@ -58,7 +57,6 @@ public final class User {
     private String phone;
 
     @Attribute(name = "name")
-    @Transient
     private String name;
 
 //    @DnAttribute(value = "ou", index = 0)
@@ -73,10 +71,25 @@ public final class User {
 
     @Attribute(name = "samaccountname")
     private String samAccountName;
+
+    @Transient
     private String plainPassword;
 
     @Attribute(name = "displayname")
-    private String displayMame;
+    private String displayName;
+    @Attribute(name = "description")
+    private String description;
+
+    public User(String userId) {
+        this.setId(userId);
+    }
+
+    public User() {
+    }
+
+    public User(Name userId) {
+        this.setId(userId);
+    }
 //
 //    public String getUnit() {
 //        return unit;
@@ -221,11 +234,19 @@ public final class User {
         this.name = name;
     }
 
-    public String getDisplayMame() {
-        return displayMame;
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public void setDisplayMame(String displayMame) {
-        this.displayMame = displayMame;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

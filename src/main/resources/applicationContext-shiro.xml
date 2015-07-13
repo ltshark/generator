@@ -20,7 +20,7 @@
 	<bean id="shiroDbRealm" class="cn.ltshark.service.account.ShiroDbRealm">
 		<property name="userService" ref="userService"/>
 		<property name="contextFactory" ref="contextFactory"/>
-		<property name="rootDN" value="sample.ldap.base"/>
+		<property name="rootDN" value="${sample.ldap.base}"/>
 	</bean>
 
 	<!--ldapRealm = main.java.name.peter.shiro.realm.ldap.LdapAuthenticator-->

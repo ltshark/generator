@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package cn.ltshark.domain.impl;
+package cn.ltshark.repository.impl;
 
-import cn.ltshark.domain.DepartmentRepo;
+import cn.ltshark.repository.DepartmentRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.NameClassPairMapper;

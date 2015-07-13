@@ -17,7 +17,6 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.ldap.UnsupportedAuthenticationMechanismException;
 import org.apache.shiro.realm.ldap.JndiLdapRealm;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
-import org.apache.shiro.realm.ldap.LdapUtils;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,6 @@ import org.springframework.beans.factory.annotation.Value;
 import javax.naming.AuthenticationNotSupportedException;
 import javax.naming.Name;
 import javax.naming.NamingException;
-import javax.naming.ldap.LdapContext;
 import java.io.Serializable;
 
 public class ShiroDbRealm extends JndiLdapRealm {
@@ -77,7 +75,8 @@ public class ShiroDbRealm extends JndiLdapRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        User user = userService.findUserByLoginName((String) principals.getPrimaryPrincipal());
+        ShiroUser shiroUser = (ShiroUser) principals.getPrimaryPrincipal();
+        User user = userService.findUserByLoginName(shiroUser.loginName);
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         if (managerDepartment.equals(user.getDepartment()))
             info.addRole("admin");
@@ -104,10 +103,12 @@ public class ShiroDbRealm extends JndiLdapRealm {
         //进行认证
 //            ctx = ldapContextFactory.getLdapContext(principal, credentials);
         //context was opened successfully, which means their credentials were valid.  Return the AuthenticationInfo:
-        boolean ok = userService.authenticate(String.valueOf(principal), String.valueOf(credentials));
-        if (ok)
-            return createAuthenticationInfo(token, principal, credentials, null);
-        else
+        String loginName = String.valueOf(principal);
+        boolean ok = userService.authenticate(loginName, new String((char[]) credentials));
+        if (ok) {
+            User user = userService.findUserByLoginName(loginName);
+            return new SimpleAuthenticationInfo(new ShiroUser(user.getId(), user.getSamAccountName(), user.getName(), user.getDepartment()), token.getCredentials(), this.getName());
+        } else
             throw new NamingException("not find " + principal);
 //        } finally {
 //            LdapUtils.closeContext(ctx);

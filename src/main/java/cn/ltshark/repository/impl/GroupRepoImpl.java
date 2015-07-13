@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.ltshark.domain.impl;
+package cn.ltshark.repository.impl;
 
 import cn.ltshark.domain.Group;
 import cn.ltshark.repository.GroupRepoExtension;

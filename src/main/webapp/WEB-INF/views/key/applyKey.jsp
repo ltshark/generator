@@ -17,17 +17,17 @@
             <thead>
             </thead>
             <tr>
-                <td width="200">姓名：</td>
-                <td width="200">电话：</td>
+                <td width="200">姓名：<c:out value="${user.name}"/></td>
+                <td width="200">电话：<c:out value="${user.phone}"/></td>
                 <td>&nbsp;</td>
             </tr>
             <tr>
-                <td>部门：</td>
+                <td>部门：<c:out value="${user.department}"/></td>
                 <td>固话：</td>
-                <td>email：</td>
+                <td>email：<c:out value="${user.email}"/></td>
             </tr>
             <tr>
-                <td>备注：</td>
+                <td>备注：<c:out value="${user.description}"/></td>
             </tr>
             <tr>
                 <td>证书信息</td>

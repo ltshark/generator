@@ -150,26 +150,28 @@ public class UserService implements BaseLdapNameAware {
         });
     }
 
-    public void updateUser(Name userId, User user) {
-        LdapName originalId = LdapUtils.newLdapName(userId);
-        User existingUser = userDao.findOne(originalId);
-
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
-        existingUser.setFullName(user.getFullName());
-        existingUser.setEmail(user.getEmail());
-        existingUser.setPhone(user.getPhone());
-        existingUser.setTitle(user.getTitle());
-        existingUser.setDepartment(user.getDepartment());
-//        existingUser.setUnit(user.getUnit());
-
-//        return null;
-
-        updateUser(existingUser);
-    }
-
-    private void updateUser(User existingUser) {
-        userDao.save(existingUser);
+    public void updateUser(User user) {
+//        LdapName originalId = LdapUtils.newLdapName(user.getId());
+//        User existingUser = userDao.findOne(originalId);
+//
+//        existingUser.setFirstName(user.getFirstName());
+//        existingUser.setLastName(user.getLastName());
+//        existingUser.setFullName(user.getFullName());
+//        existingUser.setEmail(user.getEmail());
+//        existingUser.setPhone(user.getPhone());
+//        existingUser.setTitle(user.getTitle());
+//        existingUser.setDepartment(user.getDepartment());
+//        existingUser.setDisplayName(user.getDisplayName());
+//        existingUser.setDepartment(user.getDepartment());
+//        existingUser.setName(user.getName());
+//        existingUser.setUserPrincipalName(user.getUserPrincipalName());
+//        existingUser.setSamAccountName(user.getSamAccountName());
+//        existingUser.setDescription(user.getDescription());
+//        if (StringUtils.isNotBlank(user.getPlainPassword())) {
+//            entryptPassword(user);
+//            userService.modifyPassword(user);
+//        }
+        userDao.save(user);
     }
 
     /**
@@ -207,7 +209,7 @@ public class UserService implements BaseLdapNameAware {
 //        DirContext ctx = null;
         try {
             LdapQuery query = query().where("samaccountname").is(loginName);
-            ldapTemplate.authenticate(query,password);
+            ldapTemplate.authenticate(query, password);
 //            ctx = ldapTemplate.getContextSource().getContext(user.getId().toString(), password);
 //            System.out.println(ctx);
             return true;
@@ -218,15 +220,20 @@ public class UserService implements BaseLdapNameAware {
         }
     }
 
+    public User findUserByLoginName(Name userId) {
+        return findUserByLoginName(userId.toString());
+    }
+
     private final static class UserMapper extends AbstractContextMapper<User> {
         @Override
         protected User doMapFromContext(DirContextOperations ctx) {
             User user = new User();
-            user.setId(ctx.getNameInNamespace());
+            user.setId(ctx.getDn());
+//            user.setFullName(ctx.getNameInNamespace());
             user.setFullName(ctx.getStringAttribute("cn"));
 //            user.setEmployeeNumber(Integer.valueOf(ctx.getObjectAttribute("employeeNumber")));
             user.setFirstName(ctx.getStringAttribute("givenName"));
-            user.setLastName(ctx.getStringAttribute("lastName"));
+            user.setLastName(ctx.getStringAttribute("sn"));
             user.setTitle(ctx.getStringAttribute("title"));
             user.setEmail(ctx.getStringAttribute("mail"));
             user.setPhone(ctx.getStringAttribute("telephoneNumber"));
@@ -234,7 +241,9 @@ public class UserService implements BaseLdapNameAware {
             user.setDepartment(ctx.getStringAttribute("department"));
             user.setUserPrincipalName(ctx.getStringAttribute("userprincipalname"));
             user.setSamAccountName(ctx.getStringAttribute("samaccountname"));
-            user.setDisplayMame(ctx.getStringAttribute("displayname"));
+            user.setDisplayName(ctx.getStringAttribute("displayname"));
+            user.setDescription(ctx.getStringAttribute("description"));
+            System.out.println(ctx);
             return user;
         }
     }
@@ -322,6 +331,18 @@ public class UserService implements BaseLdapNameAware {
 
         }
         User user = userService.findUserByLoginName("qware4");
+        System.out.println("-------------mapper--------------");
+        System.out.println(user);
+        user = userService.findUser("CN=qware4（快威4）,CN=Users");
+        System.out.println("-------------orm--------------");
+        System.out.println(user);
+        user = userService.findUser(user.getId());
+        System.out.println(user);
+        user.setPhone("22222");
+        user.setPlainPassword("");
+        userService.updateUser(user);
+        user = userService.findUser(user.getId());
+        System.out.println(user);
 //        user.setPlainPassword("yaic32!");
 //        userService.modifyPassword(user);
 //        ok = userService.authenticate(user.getSamAccountName(), user.getPlainPassword());

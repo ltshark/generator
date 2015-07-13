@@ -1,10 +1,11 @@
 package cn.ltshark.repository;
 
 import cn.ltshark.entity.KeyTask;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.util.List;
 
 /**
  * Created by ltshark on 15/6/7.
@@ -12,4 +13,22 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface KeyTaskDao {
 
     void deleteByUserId(Long id);
+
+    void save(List<KeyTask> keyTasks);
+
+    KeyTask findOne(Long id);
+
+    void delete(Long id);
+
+    List<KeyTask> findAll();
+
+    void save(KeyTask entity);
+
+    List<KeyTask> findAll(List<Long> taskIds);
+
+    KeyTask findOne(Specification<KeyTask> spec);
+
+    List<KeyTask> findAll(Specification<KeyTask> spec);
+
+    Page<KeyTask> findAll(Specification<KeyTask> spec, PageRequest pageRequest);
 }
