@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package cn.ltshark.domain;
+package cn.ltshark.repository;
+
+import cn.ltshark.domain.Group;
 
 import java.util.List;
 

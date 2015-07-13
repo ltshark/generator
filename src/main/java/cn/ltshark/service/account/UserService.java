@@ -16,18 +16,19 @@
 
 package cn.ltshark.service.account;
 
-import cn.ltshark.domain.*;
+import cn.ltshark.domain.Group;
 import cn.ltshark.entity.User;
+import cn.ltshark.repository.GroupRepo;
 import cn.ltshark.repository.UserDao;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
-import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.AbstractContextMapper;
@@ -51,6 +52,7 @@ import java.util.Set;
 
 import static org.springframework.ldap.query.LdapQueryBuilder.query;
 
+
 /**
  * @author Mattias Hellborg Arthursson
  */
@@ -59,8 +61,11 @@ public class UserService implements BaseLdapNameAware {
     private final UserDao userDao;
     private final GroupRepo groupRepo;
     private LdapName baseLdapPath;
-    private DirectoryType directoryType;
     private LdapTemplate ldapTemplate;
+    private static Logger logger = LoggerFactory.getLogger(UserService.class);
+    private String adminName;
+    private String adminpassword;
+    private String ldapURL;
 
     @Autowired
     public UserService(UserDao userDao, GroupRepo groupRepo) {
@@ -72,11 +77,6 @@ public class UserService implements BaseLdapNameAware {
         return groupRepo.findByName(GroupRepo.USER_GROUP);
     }
 
-    @Value("${sample.ldap.directory.type}")
-    public void setDirectoryType(DirectoryType directoryType) {
-        this.directoryType = directoryType;
-    }
-
     @Override
     public void setBaseLdapPath(LdapName baseLdapPath) {
         this.baseLdapPath = baseLdapPath;
@@ -84,30 +84,14 @@ public class UserService implements BaseLdapNameAware {
 
     public Iterable<User> findAll() {
         LdapQuery query = query().where("objectCategory").is("person").and("objectClass").is("user");
-        for (User user : (List<User>) ldapTemplate.search(query, getContextMapper()))
+        for (User user : (List<User>) ldapTemplate.search(query, new UserMapper()))
             System.out.println(user);
         System.out.println("---------------------");
         Iterable<User> all = userDao.findAll(query);
         for (User user : (List<User>) all) {
             System.out.println(user);
         }
-//      samaccountname
         return all;
-    }
-
-    protected ContextMapper getContextMapper() {
-        return new PersonContextMapper();
-    }
-
-
-    private static class PersonContextMapper extends AbstractContextMapper<User> {
-        public User doMapFromContext(DirContextOperations context) {
-            System.out.println(context);
-            User person = new User();
-            person.setFullName(context.getStringAttribute("cn"));
-            person.setLastName(context.getStringAttribute("sn"));
-            return person;
-        }
     }
 
     public User findUserByLoginName(String loginName) {
@@ -166,7 +150,7 @@ public class UserService implements BaseLdapNameAware {
         });
     }
 
-    public User updateUser(Name userId, User user) {
+    public void updateUser(Name userId, User user) {
         LdapName originalId = LdapUtils.newLdapName(userId);
         User existingUser = userDao.findOne(originalId);
 
@@ -180,33 +164,12 @@ public class UserService implements BaseLdapNameAware {
 //        existingUser.setUnit(user.getUnit());
 
 //        return null;
-        if (directoryType == DirectoryType.AD) {
-            return updateUserAd(originalId, existingUser);
-        } else {
-            return updateUserStandard(originalId, existingUser);
-        }
+
+        updateUser(existingUser);
     }
 
-
-    /**
-     * Update the user and - if its id changed - update all group references to the user.
-     *
-     * @param originalId   the original id of the user.
-     * @param existingUser the user, populated with new data
-     * @return the updated entry
-     */
-    private User updateUserStandard(LdapName originalId, User existingUser) {
-        User savedUser = userDao.save(existingUser);
-
-        if (!originalId.equals(savedUser.getId())) {
-            // The user has moved - we need to update group references.
-            LdapName oldMemberDn = toAbsoluteDn(originalId);
-            LdapName newMemberDn = toAbsoluteDn(savedUser.getId());
-
-            Collection<Group> groups = groupRepo.findByMember(oldMemberDn);
-            updateGroupReferences(groups, oldMemberDn, newMemberDn);
-        }
-        return savedUser;
+    private void updateUser(User existingUser) {
+        userDao.save(existingUser);
     }
 
     /**
@@ -238,43 +201,20 @@ public class UserService implements BaseLdapNameAware {
         return savedUser;
     }
 
-    private void updateGroupReferences(Collection<Group> groups, Name originalId, Name newId) {
-        for (Group group : groups) {
-            group.removeMember(originalId);
-            group.addMember(newId);
-
-            groupRepo.save(group);
-        }
-    }
-
-    public boolean authenticate(String userName, String password) {
-        String userId = getUserNameInNamespaceByloginName(userName);
-        if (StringUtils.isBlank(userId)) return false;
-
-        DirContext ctx = null;
+    public boolean authenticate(String loginName, String password) {
+//        User user = findUserByLoginName(loginName);
+//        if (user == null) return false;
+//        DirContext ctx = null;
         try {
-            ctx = ldapTemplate.getContextSource().getContext(userId, password);
-            System.out.println(ctx);
+            LdapQuery query = query().where("samaccountname").is(loginName);
+            ldapTemplate.authenticate(query,password);
+//            ctx = ldapTemplate.getContextSource().getContext(user.getId().toString(), password);
+//            System.out.println(ctx);
             return true;
         } catch (Exception e) {
             return false;
         } finally {
-            LdapUtils.closeContext(ctx);
-        }
-    }
-
-    private String getUserNameInNamespaceByloginName(String userName) {
-        LdapQuery query = query().where("objectCategory").is("person").and("objectClass").is("user").and("samaccountname").is(userName);
-        List<String> search = ldapTemplate.search(query, new DnContextMapper());
-        if (search.size() != 1)
-            return null;
-        return search.get(0);
-    }
-
-    private final static class DnContextMapper extends AbstractContextMapper<String> {
-        @Override
-        protected String doMapFromContext(DirContextOperations ctx) {
-            return ctx.getNameInNamespace();
+//            LdapUtils.closeContext(ctx);
         }
     }
 
@@ -283,69 +223,58 @@ public class UserService implements BaseLdapNameAware {
         protected User doMapFromContext(DirContextOperations ctx) {
             User user = new User();
             user.setId(ctx.getNameInNamespace());
+            user.setFullName(ctx.getStringAttribute("cn"));
+//            user.setEmployeeNumber(Integer.valueOf(ctx.getObjectAttribute("employeeNumber")));
+            user.setFirstName(ctx.getStringAttribute("givenName"));
+            user.setLastName(ctx.getStringAttribute("lastName"));
+            user.setTitle(ctx.getStringAttribute("title"));
+            user.setEmail(ctx.getStringAttribute("mail"));
+            user.setPhone(ctx.getStringAttribute("telephoneNumber"));
+            user.setName(ctx.getStringAttribute("name"));
+            user.setDepartment(ctx.getStringAttribute("department"));
+            user.setUserPrincipalName(ctx.getStringAttribute("userprincipalname"));
+            user.setSamAccountName(ctx.getStringAttribute("samaccountname"));
+            user.setDisplayMame(ctx.getStringAttribute("displayname"));
             return user;
         }
     }
 
-
-    public void modifyPassword(Name id, String newPwd) {
-//        String userId = getUserNameInNamespaceByloginName(userName);
-//        if (StringUtils.isBlank(userId)) return false;
-        Attributes attrs = new BasicAttributes();
-        attrs.put(Context.SECURITY_CREDENTIALS, newPwd);
-        DirContext ctx = null;
-        try {
-//            ctx = ldapTemplate.getContextSource().getContext(userId, password);
-            ModificationItem[] mods = new ModificationItem[1];
-            String newQuotedPassword = "\"" + newPwd + "\"";
-            byte[] newUnicodePassword = newQuotedPassword.getBytes("UTF-16LE");
-            mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("unicodePwd", newUnicodePassword));
-            ldapTemplate.modifyAttributes(id, mods);
-//            System.out.println(ctx);
-//            ctx.modifyAttributes(userId, DirContext.REPLACE_ATTRIBUTE, attrs);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            LdapUtils.closeContext(ctx);
-        }
-    }
-
     public void modifyPassword(User user) {
-        // java.net.Socket sock = new java.net.Socket("10.110.180.50",636);
-        // boolean b = sock.isConnected();
-//        Hashtable env = new Hashtable();
+        Hashtable env = new Hashtable();
 //        String adminName = "cn=administrator,cn=users,DC=yaic,DC=com,DC=cn";
 //
 //        String adminpassword = "Yf821010";
 //        String userName = "CN=qware4（快威4）,CN=users,DC=yaic,DC=com,DC=cn";
-//        //old password Ab123456
+//        String userName = "CN=qware4（快威4）,CN=users,DC=yaic,DC=com,DC=cn";
+        //old password Ab123456
 //        String newPassword = "yaic32@";
 //        String keystore = "C:\\Program Files\\Java\\jdk1.7.0_45\\jre\\lib\\security\\cacerts2";
-//        //   String keystore = "E:/project/iam/testADlhj.keystore";
+        //   String keystore = "E:/project/iam/testADlhj.keystore";
 //        System.setProperty("javax.net.ssl.trustStore", keystore);
 //        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
-//        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-//        env.put(Context.SECURITY_AUTHENTICATION, "simple");
-//        env.put(Context.SECURITY_PRINCIPAL, adminName);
-//        env.put(Context.SECURITY_CREDENTIALS, adminpassword);
-//        env.put(Context.SECURITY_PROTOCOL, "ssl");
 //        String ldapURL = "ldap://192.168.134.129:636";
-//        env.put(Context.PROVIDER_URL, ldapURL);
-//        LdapContext ctx = null;
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+        env.put(Context.SECURITY_PRINCIPAL, adminName);
+        env.put(Context.SECURITY_CREDENTIALS, adminpassword);
+        env.put(Context.SECURITY_PROTOCOL, "ssl");
+        env.put(Context.PROVIDER_URL, ldapURL);
+        LdapContext ctx = null;
         try {
-//            ctx = new InitialLdapContext(env, null);
+            ctx = new InitialLdapContext(env, null);
             ModificationItem[] mods = new ModificationItem[1];
             mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("unicodePwd", user.getPassword()));
-            ldapTemplate.modifyAttributes(user.getId(), mods);
+            ctx.modifyAttributes(user.getId(), mods);
             System.out.println("Reset Password for: " + user.getId());
             System.out.println("Problem encoding password222: ");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Problem encoding password222: " + e);
         } finally {
-//            LdapUtils.closeContext(ctx);
+            LdapUtils.closeContext(ctx);
         }
     }
+
 
     public List<User> searchByNameName(String lastName) {
         return userDao.findByFullNameContains(lastName);
@@ -356,13 +285,27 @@ public class UserService implements BaseLdapNameAware {
         this.ldapTemplate = ldapTemplate;
     }
 
+    @Value("${sample.ldap.admin}")
+    public void setAdminName(String adminName) {
+        this.adminName = adminName;
+    }
+
+    @Value("${sample.ldap.password}")
+    public void setAdminpassword(String adminpassword) {
+        this.adminpassword = adminpassword;
+    }
+
+    @Value("${sample.ldap.url}")
+    public void setLdapURL(String ldapURL) {
+        this.ldapURL = ldapURL;
+    }
+
     public static void main(String[] args) throws InvalidNameException {
         ApplicationContext applicationContext = new FileSystemXmlApplicationContext("classpath*:/applicationContext.xml");
         UserService userService = (UserService) applicationContext.getBean("userService");
 //        List<User> users = (List<User>) userService.findAll();
 //        System.out.println(users);
-        userService.setDirectoryType(DirectoryType.AD);
-        boolean ok = userService.authenticate("qware4", "yaic32!");
+        boolean ok = userService.authenticate("qware4", "yaic32@");
         System.out.println(ok);
 //        Name qware4 = userService.getUserIdByLoginName("qware4");
 //        System.out.println(qware4);
@@ -373,10 +316,15 @@ public class UserService implements BaseLdapNameAware {
 //        user.setPhone("111111111111");
 //        userService.updateUser(qware4, user);
 
-//        Name qware4 = userService.getUserIdByLoginName("qware4");
-        Name id = new LdapName("CN=qware4（快威4）,CN=Users,dc=yaic,dc=com,dc=cn");
-        userService.modifyPassword(id, "yaic32");
-        ok = userService.authenticate("qware4", "yaic32@");
+        if (!ok) {
+            System.out.println("authenticate error");
+            return;
+
+        }
+        User user = userService.findUserByLoginName("qware4");
+//        user.setPlainPassword("yaic32!");
+//        userService.modifyPassword(user);
+//        ok = userService.authenticate(user.getSamAccountName(), user.getPlainPassword());
         System.out.println(ok);
 
     }

@@ -25,6 +25,7 @@ import org.springframework.ldap.support.LdapUtils;
 
 import javax.naming.Name;
 import javax.persistence.Transient;
+import java.io.UnsupportedEncodingException;
 
 /**
  * @author Mattias Hellborg Arthursson
@@ -56,7 +57,7 @@ public final class User {
     @Attribute(name = "telephoneNumber")
     private String phone;
 
-    @DnAttribute(value = "cn", index = 0)
+    @Attribute(name = "name")
     @Transient
     private String name;
 
@@ -73,7 +74,9 @@ public final class User {
     @Attribute(name = "samaccountname")
     private String samAccountName;
     private String plainPassword;
-    private byte[] password;
+
+    @Attribute(name = "displayname")
+    private String displayMame;
 //
 //    public String getUnit() {
 //        return unit;
@@ -205,12 +208,9 @@ public final class User {
         this.plainPassword = plainPassword;
     }
 
-    public void setPassword(byte[] password) {
-        this.password = password;
-    }
-
-    public byte[] getPassword() {
-        return password;
+    public byte[] getPassword() throws UnsupportedEncodingException {
+        String newQuotedPassword = "\"" + this.getPlainPassword() + "\"";
+        return newQuotedPassword.getBytes("UTF-16LE");
     }
 
     public String getName() {
@@ -219,5 +219,13 @@ public final class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDisplayMame() {
+        return displayMame;
+    }
+
+    public void setDisplayMame(String displayMame) {
+        this.displayMame = displayMame;
     }
 }

@@ -28,7 +28,6 @@
           			  classpath*:/application.development.properties,classpath*:/ldap.properties"/>
 
     <!-- LDAP -->
-
     <ldap:context-source id="contextSource"
                          password="${sample.ldap.password}"
                          url="${sample.ldap.url}"

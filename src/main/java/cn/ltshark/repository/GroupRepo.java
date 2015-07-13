@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package cn.ltshark.domain;
+package cn.ltshark.repository;
 
+import cn.ltshark.domain.Group;
 import org.springframework.ldap.repository.LdapRepository;
 import org.springframework.ldap.repository.Query;
 

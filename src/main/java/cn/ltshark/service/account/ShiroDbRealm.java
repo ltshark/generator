@@ -52,7 +52,6 @@ public class ShiroDbRealm extends JndiLdapRealm {
             throw new CaptchaException("验证码错误");
         }
 
-        AuthenticationInfo info;
         try {
             return queryForAuthenticationInfo(token, getContextFactory());
         } catch (AuthenticationNotSupportedException e) {
@@ -78,8 +77,7 @@ public class ShiroDbRealm extends JndiLdapRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-//        ShiroUser shiroUser = (ShiroUser) principals.getPrimaryPrincipal();
-        User user = userService.findUserByLoginName((String)principals.getPrimaryPrincipal());
+        User user = userService.findUserByLoginName((String) principals.getPrimaryPrincipal());
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         if (managerDepartment.equals(user.getDepartment()))
             info.addRole("admin");
@@ -90,7 +88,6 @@ public class ShiroDbRealm extends JndiLdapRealm {
 
     @Override
     protected AuthenticationInfo queryForAuthenticationInfo(AuthenticationToken token, LdapContextFactory ldapContextFactory) throws NamingException {
-        UsernamePasswordCaptchaToken authcToken = (UsernamePasswordCaptchaToken) token;
 
         //从页面提交的用户名“lisi”
         Object principal = token.getPrincipal();
@@ -100,17 +97,21 @@ public class ShiroDbRealm extends JndiLdapRealm {
         log.info("Authenticating user '{}' through LDAP", principal);
 
         //将用户名拼成DN“cn=lisi,ou=产品研发部,ou=研发中心,dc=example,dc=com”
-        principal = getLdapPrincipal(token);
-
-        LdapContext ctx = null;
-        try {
-            //进行认证
-            ctx = ldapContextFactory.getLdapContext(principal, credentials);
-            //context was opened successfully, which means their credentials were valid.  Return the AuthenticationInfo:
-            return createAuthenticationInfo(token, principal, credentials, ctx);
-        } finally {
-            LdapUtils.closeContext(ctx);
-        }
+//        principal = getLdapPrincipal(token);
+//
+//        LdapContext ctx = null;
+//        try {
+        //进行认证
+//            ctx = ldapContextFactory.getLdapContext(principal, credentials);
+        //context was opened successfully, which means their credentials were valid.  Return the AuthenticationInfo:
+        boolean ok = userService.authenticate(String.valueOf(principal), String.valueOf(credentials));
+        if (ok)
+            return createAuthenticationInfo(token, principal, credentials, null);
+        else
+            throw new NamingException("not find " + principal);
+//        } finally {
+//            LdapUtils.closeContext(ctx);
+//        }
     }
 
 //    @Override

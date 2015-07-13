@@ -17,7 +17,7 @@
 package cn.ltshark.domain.impl;
 
 import cn.ltshark.domain.Group;
-import cn.ltshark.domain.GroupRepoExtension;
+import cn.ltshark.repository.GroupRepoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;

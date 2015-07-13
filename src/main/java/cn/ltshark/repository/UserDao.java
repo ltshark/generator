@@ -27,5 +27,5 @@ import java.util.List;
 public interface UserDao extends LdapRepository<User> {
     User findByEmployeeNumber(int employeeNumber);
     List<User> findByFullNameContains(String name);
-    User findByLoginName(String loginName);
+//    User findByLoginName(String loginName);
 }
