@@ -26,7 +26,6 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.ldap.core.DirContextOperations;
@@ -38,12 +37,11 @@ import org.springframework.ldap.support.LdapNameBuilder;
 import org.springframework.ldap.support.LdapUtils;
 import org.springframework.stereotype.Component;
 
-import javax.naming.Context;
 import javax.naming.InvalidNameException;
 import javax.naming.Name;
-import javax.naming.directory.*;
-import javax.naming.ldap.InitialLdapContext;
-import javax.naming.ldap.LdapContext;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 import javax.naming.ldap.LdapName;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -63,9 +61,6 @@ public class UserService implements BaseLdapNameAware {
     private LdapName baseLdapPath;
     private LdapTemplate ldapTemplate;
     private static Logger logger = LoggerFactory.getLogger(UserService.class);
-    private String adminName;
-    private String adminpassword;
-    private String ldapURL;
 
     @Autowired
     public UserService(UserDao userDao, GroupRepo groupRepo) {
@@ -262,26 +257,28 @@ public class UserService implements BaseLdapNameAware {
 //        System.setProperty("javax.net.ssl.trustStore", keystore);
 //        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
 //        String ldapURL = "ldap://192.168.134.129:636";
-        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        env.put(Context.SECURITY_PRINCIPAL, adminName);
-        env.put(Context.SECURITY_CREDENTIALS, adminpassword);
-        env.put(Context.SECURITY_PROTOCOL, "ssl");
-        env.put(Context.PROVIDER_URL, ldapURL);
-        LdapContext ctx = null;
+//        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+//        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+//        env.put(Context.SECURITY_PRINCIPAL, adminName);
+//        env.put(Context.SECURITY_CREDENTIALS, adminpassword);
+//        env.put(Context.SECURITY_PROTOCOL, "ssl");
+//        env.put(Context.PROVIDER_URL, ldapURL);
+//        LdapContext ctx = null;
         try {
-            ctx = new InitialLdapContext(env, null);
-            ModificationItem[] mods = new ModificationItem[1];
+//            ctx = new InitialLdapContext(env, null);
+            ModificationItem[] mods = new ModificationItem[2];
             mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("unicodePwd", user.getPassword()));
-            ctx.modifyAttributes(user.getId(), mods);
+            mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("unicodePwd", user.getPassword()));
+            ldapTemplate.modifyAttributes(user.getId(), mods);
             System.out.println("Reset Password for: " + user.getId());
-            System.out.println("Problem encoding password222: ");
+            System.out.println("Problem encoding password222: "+user.getPlainPassword());
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Problem encoding password222: " + e);
-        } finally {
-            LdapUtils.closeContext(ctx);
         }
+//        finally {
+//            LdapUtils.closeContext(ctx);
+//        }
     }
 
 
@@ -294,27 +291,12 @@ public class UserService implements BaseLdapNameAware {
         this.ldapTemplate = ldapTemplate;
     }
 
-    @Value("${sample.ldap.admin}")
-    public void setAdminName(String adminName) {
-        this.adminName = adminName;
-    }
-
-    @Value("${sample.ldap.password}")
-    public void setAdminpassword(String adminpassword) {
-        this.adminpassword = adminpassword;
-    }
-
-    @Value("${sample.ldap.url}")
-    public void setLdapURL(String ldapURL) {
-        this.ldapURL = ldapURL;
-    }
-
     public static void main(String[] args) throws InvalidNameException {
         ApplicationContext applicationContext = new FileSystemXmlApplicationContext("classpath*:/applicationContext.xml");
         UserService userService = (UserService) applicationContext.getBean("userService");
 //        List<User> users = (List<User>) userService.findAll();
 //        System.out.println(users);
-        boolean ok = userService.authenticate("qware4", "yaic32@");
+        boolean ok = userService.authenticate("qware4", "yaic32!");
         System.out.println(ok);
 //        Name qware4 = userService.getUserIdByLoginName("qware4");
 //        System.out.println(qware4);
@@ -343,9 +325,9 @@ public class UserService implements BaseLdapNameAware {
         userService.updateUser(user);
         user = userService.findUser(user.getId());
         System.out.println(user);
-//        user.setPlainPassword("yaic32!");
-//        userService.modifyPassword(user);
-//        ok = userService.authenticate(user.getSamAccountName(), user.getPlainPassword());
+        user.setPlainPassword("yaic32@");
+        userService.modifyPassword(user);
+        ok = userService.authenticate(user.getSamAccountName(), user.getPlainPassword());
         System.out.println(ok);
 
     }
