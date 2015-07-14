@@ -39,7 +39,7 @@
                         </shiro:hasRole>
 
                             <%--<li><a href="${ctx}/api">APIs</a></li>--%>
-                        <li><a href="${ctx}/profile">密码修改</a></li>
+                        <li><a href="${ctx}/profile">信息修改</a></li>
                         <li><a href="${ctx}/logout">登出</a></li>
                     </ul>
                 </div>

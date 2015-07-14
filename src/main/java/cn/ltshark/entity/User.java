@@ -17,6 +17,8 @@
 package cn.ltshark.entity;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.ldap.odm.annotations.Attribute;
 import org.springframework.ldap.odm.annotations.Entry;
 import org.springframework.ldap.odm.annotations.Id;
@@ -51,6 +53,7 @@ public final class User {
     private String title;
 
     @Attribute(name = "mail")
+    @Email()
     private String email;
 
     @Attribute(name = "telephoneNumber")

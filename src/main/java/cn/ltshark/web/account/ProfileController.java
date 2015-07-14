@@ -15,10 +15,13 @@ import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import cn.ltshark.entity.User;
 import cn.ltshark.service.account.ShiroDbRealm.ShiroUser;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * 用户修改自己资料的Controller.
@@ -45,7 +48,11 @@ public class ProfileController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute("user") User user) {
+    public String update(@Valid @ModelAttribute("user") User user,BindingResult br, RedirectAttributes redirectAttributes) {
+        if(br.hasErrors()) {
+            redirectAttributes.addFlashAttribute("error", br.getAllErrors().get(0).getDefaultMessage());
+            return "redirect:/profile";
+        }
         userService.updateUser(user);
         updateCurrentUserName(user.getName());
         return "redirect:/";

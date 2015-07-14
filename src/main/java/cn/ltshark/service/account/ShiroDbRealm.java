@@ -95,14 +95,6 @@ public class ShiroDbRealm extends JndiLdapRealm {
 
         log.info("Authenticating user '{}' through LDAP", principal);
 
-        //将用户名拼成DN“cn=lisi,ou=产品研发部,ou=研发中心,dc=example,dc=com”
-//        principal = getLdapPrincipal(token);
-//
-//        LdapContext ctx = null;
-//        try {
-        //进行认证
-//            ctx = ldapContextFactory.getLdapContext(principal, credentials);
-        //context was opened successfully, which means their credentials were valid.  Return the AuthenticationInfo:
         String loginName = String.valueOf(principal);
         boolean ok = userService.authenticate(loginName, new String((char[]) credentials));
         if (ok) {
@@ -110,53 +102,7 @@ public class ShiroDbRealm extends JndiLdapRealm {
             return new SimpleAuthenticationInfo(new ShiroUser(user.getId(), user.getSamAccountName(), user.getName(), user.getDepartment()), token.getCredentials(), this.getName());
         } else
             throw new NamingException("not find " + principal);
-//        } finally {
-//            LdapUtils.closeContext(ctx);
-//        }
     }
-
-//    @Override
-//    protected AuthenticationInfo queryForAuthenticationInfo(AuthenticationToken token, LdapContextFactory ldapContextFactory) throws NamingException {
-//        Object principal = token.getPrincipal();
-//        Object credentials = token.getCredentials();
-//        LdapContext systemCtx = null;
-//        LdapContext ctx = null;
-//        try {
-//            systemCtx = ldapContextFactory.getSystemLdapContext();
-//            SearchControls constraints = new SearchControls();
-//            constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-//            NamingEnumeration results = systemCtx.search(rootDN, "cn=" + principal, constraints);
-//            if (results != null && !results.hasMore()) {
-//                throw new UnknownAccountException();
-//            } else {
-//                while (results.hasMore()) {
-//                    SearchResult si = (SearchResult) results.next();
-//                    principal = si.getName() + "," + rootDN;
-//                }
-//                log.info("DN=" + principal);
-//                try {
-//                    ctx = ldapContextFactory.getLdapContext(principal, credentials);
-//                } catch (NamingException e) {
-//                    throw new IncorrectCredentialsException();
-//                }
-//                return createAuthenticationInfo(token, principal, credentials, ctx);
-//            }
-//        } finally {
-//            LdapUtils.closeContext(systemCtx);
-//            LdapUtils.closeContext(ctx);
-//        }
-//    }
-
-//    /**
-//     * 设定Password校验的Hash算法与迭代次数.
-//     */
-//    @PostConstruct
-//    public void initCredentialsMatcher() {
-//        HashedCredentialsMatcher matcher = new HashedCredentialsMatcher(AccountService.HASH_ALGORITHM);
-//        matcher.setHashIterations(AccountService.HASH_INTERATIONS);
-//
-//        setCredentialsMatcher(matcher);
-//    }
 
     @Value("${sample.ldap.base}")
     public void setRootDN(String rootDN) {
