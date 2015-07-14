@@ -20,6 +20,7 @@ import cn.ltshark.domain.Group;
 import cn.ltshark.entity.User;
 import cn.ltshark.repository.GroupRepo;
 import cn.ltshark.repository.UserDao;
+import cn.ltshark.service.ServiceException;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -244,7 +245,7 @@ public class UserService implements BaseLdapNameAware {
     }
 
     public void modifyPassword(User user) {
-        Hashtable env = new Hashtable();
+//        Hashtable env = new Hashtable();
 //        String adminName = "cn=administrator,cn=users,DC=yaic,DC=com,DC=cn";
 //
 //        String adminpassword = "Yf821010";
@@ -271,10 +272,11 @@ public class UserService implements BaseLdapNameAware {
             mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("unicodePwd", user.getPassword()));
             ldapTemplate.modifyAttributes(user.getId(), mods);
             System.out.println("Reset Password for: " + user.getId());
-            System.out.println("Problem encoding password222: "+user.getPlainPassword());
+            System.out.println("Problem encoding password222: " + user.getPlainPassword());
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Problem encoding password222: " + e);
+            throw new ServiceException(e.getMessage());
         }
 //        finally {
 //            LdapUtils.closeContext(ctx);

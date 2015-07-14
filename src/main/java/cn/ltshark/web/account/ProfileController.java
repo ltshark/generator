@@ -8,6 +8,7 @@ package cn.ltshark.web.account;
 import javax.naming.Name;
 import javax.validation.Valid;
 
+import cn.ltshark.service.ServiceException;
 import cn.ltshark.service.account.UserService;
 import cn.ltshark.web.editor.NameEditor;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,7 @@ public class ProfileController {
         NameEditor nameEditor = new NameEditor();
         binder.registerCustomEditor(Name.class, nameEditor);
     }
+
     @Autowired
     private UserService userService;
 
@@ -48,12 +50,21 @@ public class ProfileController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute("user") User user,BindingResult br, RedirectAttributes redirectAttributes) {
-        if(br.hasErrors()) {
+    public String update(@Valid @ModelAttribute("user") User user, BindingResult br, RedirectAttributes redirectAttributes) {
+        if (br.hasErrors()) {
             redirectAttributes.addFlashAttribute("error", br.getAllErrors().get(0).getDefaultMessage());
             return "redirect:/profile";
         }
-        userService.updateUser(user);
+        try {
+            userService.updateUser(user);
+        } catch (ServiceException e) {
+            if (e.getMessage().contains("LDAP: error code 53 - 0000052D")) {
+                redirectAttributes.addFlashAttribute("error", "密码强度不够，请输入6位密码并包含：数字、字符、特殊符号");
+                return "redirect:/profile";
+            } else {
+                throw e;
+            }
+        }
         updateCurrentUserName(user.getName());
         return "redirect:/";
     }
