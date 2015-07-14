@@ -23,6 +23,7 @@ import cn.ltshark.repository.UserDao;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,10 +163,9 @@ public class UserService implements BaseLdapNameAware {
 //        existingUser.setUserPrincipalName(user.getUserPrincipalName());
 //        existingUser.setSamAccountName(user.getSamAccountName());
 //        existingUser.setDescription(user.getDescription());
-//        if (StringUtils.isNotBlank(user.getPlainPassword())) {
-//            entryptPassword(user);
-//            userService.modifyPassword(user);
-//        }
+        if (StringUtils.isNotBlank(user.getPlainPassword())) {
+            modifyPassword(user);
+        }
         userDao.save(user);
     }
 
