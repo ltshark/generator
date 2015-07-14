@@ -21,10 +21,12 @@ import cn.ltshark.entity.User;
 import cn.ltshark.repository.GroupRepo;
 import cn.ltshark.repository.UserDao;
 import cn.ltshark.service.ServiceException;
+import cn.ltshark.service.account.ShiroDbRealm.ShiroUser;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +48,6 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.ldap.LdapName;
 import java.util.Collection;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
@@ -218,6 +219,20 @@ public class UserService implements BaseLdapNameAware {
 
     public User findUserByLoginName(Name userId) {
         return findUserByLoginName(userId.toString());
+    }
+
+    /**
+     * 取出Shiro中的当前用户Id.
+     */
+    public User getCurrentUser() {
+        ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
+        return findUser(user.id);
+    }
+
+    public boolean isDepartmentAdmin(User currentUser) {
+        if (currentUser == null)
+            return false;
+        return "Network".equals(currentUser.getDepartment());
     }
 
     private final static class UserMapper extends AbstractContextMapper<User> {
