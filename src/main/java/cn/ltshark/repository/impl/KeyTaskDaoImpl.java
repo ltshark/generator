@@ -2,11 +2,17 @@ package cn.ltshark.repository.impl;
 
 import cn.ltshark.entity.KeyTask;
 import cn.ltshark.repository.KeyTaskDao;
+import cn.ltshark.util.GlobalConfig;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -14,9 +20,18 @@ import java.util.List;
  */
 @Component
 public class KeyTaskDaoImpl implements KeyTaskDao {
-    @Override
-    public void deleteByUserId(Long id) {
 
+    private static Logger logger = LoggerFactory.getLogger(KeyTaskDao.class);
+
+    @Override
+    public void deleteByUserLoginName(String id) {
+        for (String path : GlobalConfig.TASK_PATHS) {
+            File file = new File(path, id);
+            if (!file.exists()) {
+                continue;
+            }
+            file.delete();
+        }
     }
 
     @Override
@@ -25,13 +40,20 @@ public class KeyTaskDaoImpl implements KeyTaskDao {
     }
 
     @Override
-    public KeyTask findOne(Long id) {
-        return null;
-    }
-
-    @Override
-    public void delete(Long id) {
-
+    public KeyTask findOne(String id) {
+        KeyTask keyTask = null;
+        for (String path : GlobalConfig.TASK_PATHS) {
+            File file = new File(path, id);
+            if (!file.exists())
+                continue;
+            try {
+                keyTask = KeyTask.toKeyTask(FileUtils.readFileToString(file, GlobalConfig.UTF_8));
+            } catch (IOException e) {
+                logger.info("getUserKeyTask %s", e.getMessage());
+            }
+            break;
+        }
+        return keyTask;
     }
 
     @Override
@@ -41,7 +63,12 @@ public class KeyTaskDaoImpl implements KeyTaskDao {
 
     @Override
     public void save(KeyTask entity) {
-
+        String savePath = GlobalConfig.getStatePath(entity.getStatus());
+        try {
+            FileUtils.writeStringToFile(new File(savePath, entity.getUserLoginName()), entity.toString(), GlobalConfig.UTF_8);
+        } catch (IOException e) {
+            logger.error("save task error", e);
+        }
     }
 
     @Override

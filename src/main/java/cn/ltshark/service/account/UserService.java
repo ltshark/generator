@@ -16,7 +16,7 @@
 
 package cn.ltshark.service.account;
 
-import cn.ltshark.domain.Group;
+import cn.ltshark.entity.Group;
 import cn.ltshark.entity.User;
 import cn.ltshark.repository.GroupRepo;
 import cn.ltshark.repository.UserDao;

@@ -12,13 +12,11 @@ import java.util.List;
  */
 public interface KeyTaskDao {
 
-    void deleteByUserId(Long id);
+    void deleteByUserLoginName(String userLoginName);
 
     void save(List<KeyTask> keyTasks);
 
-    KeyTask findOne(Long id);
-
-    void delete(Long id);
+    KeyTask findOne(String id);
 
     List<KeyTask> findAll();
 

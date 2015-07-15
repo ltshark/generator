@@ -10,6 +10,7 @@ import cn.ltshark.entity.User;
 import cn.ltshark.service.account.UserService;
 import cn.ltshark.service.key.KeyTaskService;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,7 @@ public class KeyAdminController {
     }
 
     @RequestMapping(value = "approval/{id}", method = RequestMethod.GET)
-    public String agree(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String agree(@PathVariable("id") String id, Model model, RedirectAttributes redirectAttributes) {
         return handleTask(id, redirectAttributes, KeyTask.AGREE_APPLY_STATUS);
     }
 
@@ -102,8 +103,8 @@ public class KeyAdminController {
         return "redirect:/admin/key/listUserKeyTask";
     }
 
-    private String handleTask(@PathVariable("id") Long id, RedirectAttributes redirectAttributes, String agreeApplyStatus) {
-        KeyTask keyTask = keyTaskService.getKeyTask(id);
+    private String handleTask(@PathVariable("id") String id, RedirectAttributes redirectAttributes, String agreeApplyStatus) {
+        KeyTask keyTask = keyTaskService.getUserKeyTask(id);
         keyTask.setStatus(agreeApplyStatus);
         keyTask.setApprovalDate(new Date());
         keyTaskService.saveKeyTask(keyTask);
@@ -112,7 +113,7 @@ public class KeyAdminController {
     }
 
     @RequestMapping(value = "refuse/{id}", method = RequestMethod.GET)
-    public String refuse(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String refuse(@PathVariable("id") String id, Model model, RedirectAttributes redirectAttributes) {
         return handleTask(id, redirectAttributes, KeyTask.REFUSE_APPLY_STATUS);
     }
 
@@ -124,14 +125,14 @@ public class KeyAdminController {
 //    }
 
     @RequestMapping(value = "deleteAgree/{id}")
-    public String deleteAgree(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+    public String deleteAgree(@PathVariable("id") String id, RedirectAttributes redirectAttributes) {
         keyTaskService.deleteKeyTask(id);
         redirectAttributes.addFlashAttribute("message", "删除申请成功");
         return "redirect:/admin/key/listKeyTask?taskStatus=2";
     }
 
     @RequestMapping(value = "deleteRefuse/{id}")
-    public String deleteRefuse(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+    public String deleteRefuse(@PathVariable("id") String id, RedirectAttributes redirectAttributes) {
         keyTaskService.deleteKeyTask(id);
         redirectAttributes.addFlashAttribute("message", "删除申请成功");
         return "redirect:/admin/key/listKeyTask?taskStatus=3";
@@ -142,9 +143,9 @@ public class KeyAdminController {
      * 因为仅update()方法的form中有id属性，因此仅在update时实际执行.
      */
     @ModelAttribute
-    public void getKeyTask(@RequestParam(value = "id", defaultValue = "-1") Long id, Model model) {
-        if (id != -1) {
-            model.addAttribute("task", keyTaskService.getKeyTask(id));
+    public void getKeyTask(@RequestParam(value = "id", defaultValue = "-1") String id, Model model) {
+        if (StringUtils.isNotBlank(id)) {
+            model.addAttribute("task", keyTaskService.getUserKeyTask(id));
         }
     }
 

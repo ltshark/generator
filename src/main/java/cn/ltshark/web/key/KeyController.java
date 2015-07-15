@@ -7,6 +7,7 @@ package cn.ltshark.web.key;
 
 import cn.ltshark.entity.KeyTask;
 import cn.ltshark.entity.User;
+import cn.ltshark.service.account.ShiroDbRealm.ShiroUser;
 import cn.ltshark.service.account.UserService;
 import cn.ltshark.service.key.KeyTaskService;
 import com.google.common.collect.Maps;
@@ -16,15 +17,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springside.modules.web.Servlets;
-import cn.ltshark.service.account.ShiroDbRealm.ShiroUser;
 
-import javax.naming.Name;
-import javax.servlet.ServletRequest;
 import java.util.Date;
 import java.util.Map;
 
@@ -49,17 +45,15 @@ public class KeyController {
     private UserService userService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String list(ServletRequest request, Model model) {
-        Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
-        searchParams.put("EQ_user.id", String.valueOf(getCurrentUserId()));
-        KeyTask keyTask = keyTaskService.getUserKeyTask(searchParams);
+    public String list(Model model) {
+        KeyTask keyTask = keyTaskService.getUserKeyTask(getCurrentUserLoginName());
         boolean canDownload = false;
         if (keyTask != null && KeyTask.AGREE_APPLY_STATUS.equals(keyTask.getStatus())) {
             canDownload = true;
         }
         model.addAttribute("task", keyTask);
         model.addAttribute("canDownload", canDownload);
-        model.addAttribute("user",userService.findUserByLoginName(getCurrentUserId()));
+        model.addAttribute("user", userService.findUserByLoginName(getCurrentUserLoginName()));
 
         // 将搜索条件编码成字符串，用于排序，分页的URL
 //		model.addAttribute("searchParams", Servlets.encodeParameterStringWithPrefix(searchParams, "search_"));
@@ -71,7 +65,7 @@ public class KeyController {
     public String createForm(Model model, @RequestParam(value = "keyType", defaultValue = "1") String keyType) {
         model.addAttribute("keyType", keyType);
         model.addAttribute("action", "create");
-        User user = userService.findUser(getCurrentUserId());
+        User user = userService.findUser(getCurrentUserLoginName());
         model.addAttribute("user", user);
         if ("1".equals(keyType) || "2".equals(keyType))
             return "key/keyForm";
@@ -83,7 +77,7 @@ public class KeyController {
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public String create(Model model, @RequestParam("keyType") String keyType) {
         KeyTask keyTask = new KeyTask();
-        keyTask.setUser(new User(getCurrentUserId()));
+        keyTask.setUserLoginName(getCurrentUserLoginName());
         keyTask.setType(keyType);
         keyTask.setStatus(KeyTask.APPLYING_STATUS);
         keyTask.setApplyDate(new Date());
@@ -99,21 +93,10 @@ public class KeyController {
     }
 
     /**
-     * 所有RequestMapping方法调用前的Model准备方法, 实现Struts2 Preparable二次部分绑定的效果,先根据form的id从数据库查出Task对象,再把Form提交的内容绑定到该对象上。
-     * 因为仅update()方法的form中有id属性，因此仅在update时实际执行.
-     */
-    @ModelAttribute
-    public void getKeyTask(@RequestParam(value = "id", defaultValue = "-1") Long id, Model model) {
-        if (id != -1) {
-            model.addAttribute("task", keyTaskService.getKeyTask(id));
-        }
-    }
-
-    /**
      * 取出Shiro中的当前用户Id.
      */
-    private Name getCurrentUserId() {
+    private String getCurrentUserLoginName() {
         ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
-        return user.id;
+        return user.loginName;
     }
 }

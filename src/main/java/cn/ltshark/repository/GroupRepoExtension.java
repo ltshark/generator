@@ -16,7 +16,7 @@
 
 package cn.ltshark.repository;
 
-import cn.ltshark.domain.Group;
+import cn.ltshark.entity.Group;
 
 import java.util.List;
 

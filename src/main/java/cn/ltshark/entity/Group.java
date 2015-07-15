@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.ltshark.domain;
+package cn.ltshark.entity;
 
 import org.springframework.ldap.odm.annotations.Attribute;
 import org.springframework.ldap.odm.annotations.DnAttribute;

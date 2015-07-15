@@ -1,8 +1,11 @@
 package cn.ltshark.entity;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -13,8 +16,13 @@ public class KeyTask {
     public static final String APPLYING_STATUS = "1";
     public static final String AGREE_APPLY_STATUS = "2";
     public static final String REFUSE_APPLY_STATUS = "3";
+
+    public static final String HARDWARE_TYPE = "1";
+    public static final String SOFTWARE_TYPE = "2";
+    public static final String TEMP_TYPE = "3";
+
     private String type;
-    private User user;
+    private String userLoginName;
     private String status;
     private Date applyDate;//申请时间
     private Date approvalDate;//审批时间
@@ -27,12 +35,12 @@ public class KeyTask {
         this.type = type;
     }
 
-    public User getUser() {
-        return user;
+    public String getUserLoginName() {
+        return userLoginName;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserLoginName(String userLoginName) {
+        this.userLoginName = userLoginName;
     }
 
     public String getStatus() {
@@ -45,7 +53,8 @@ public class KeyTask {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        return StringUtils.join(new String[]{type, userLoginName, status, simpleDateFormat.format(applyDate), simpleDateFormat.format(approvalDate)}, ",");
     }
 
     public Date getApprovalDate() {
@@ -62,5 +71,30 @@ public class KeyTask {
 
     public void setApplyDate(Date applyDate) {
         this.applyDate = applyDate;
+    }
+
+    public static KeyTask toKeyTask(String s) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        String[] strings = StringUtils.split(s);
+        KeyTask keyTask = new KeyTask();
+        int i = 0;
+        keyTask.setType(strings[i++]);
+        keyTask.setUserLoginName(strings[i++]);
+        keyTask.setStatus(strings[i++]);
+        try {
+            if (strings.length > 3)
+                keyTask.setApplyDate(simpleDateFormat.parse(strings[i++]));
+            if (strings.length > 4)
+                keyTask.setApprovalDate(simpleDateFormat.parse(strings[i++]));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return keyTask;
+    }
+
+    public static void main(String[] args) {
+        KeyTask keyTask = new KeyTask();
+        keyTask.setType("a");
+        System.out.println(keyTask.toString());
     }
 }

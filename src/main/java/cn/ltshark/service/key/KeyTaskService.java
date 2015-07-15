@@ -6,8 +6,9 @@
 package cn.ltshark.service.key;
 
 import cn.ltshark.entity.KeyTask;
-import cn.ltshark.entity.User;
 import cn.ltshark.repository.KeyTaskDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,32 +16,28 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springside.modules.persistence.DynamicSpecifications;
 import org.springside.modules.persistence.SearchFilter;
-import org.springside.modules.persistence.SearchFilter.Operator;
 
-import java.security.Key;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 // Spring Bean的标识.
 @Component
-// 类中所有public函数都纳入事务管理的标识.
-@Transactional
 public class KeyTaskService {
 
-    private KeyTaskDao keyTaskDao;
+    private static Logger logger = LoggerFactory.getLogger(KeyTaskService.class);
 
-    public KeyTask getKeyTask(Long id) {
-        return keyTaskDao.findOne(id);
-    }
+    private KeyTaskDao keyTaskDao;
 
     public void saveKeyTask(KeyTask entity) {
         keyTaskDao.save(entity);
     }
 
-    public void deleteKeyTask(Long id) {
-        keyTaskDao.delete(id);
+    public void deleteKeyTask(String userLoginName) {
+        keyTaskDao.deleteByUserLoginName(userLoginName);
     }
 
     public List<KeyTask> getAllKeyTask() {
@@ -101,9 +98,7 @@ public class KeyTaskService {
         List<KeyTask> keyTasks = new ArrayList<KeyTask>();
         for (String userid : userIds) {
             KeyTask keyTask = new KeyTask();
-            User user = new User();
-            user.setId(userid);
-            keyTask.setUser(user);
+            keyTask.setUserLoginName(userid);
             keyTask.setType(keyType);
             keyTask.setStatus(KeyTask.APPLYING_STATUS);
             keyTask.setApplyDate(new Date());
@@ -116,5 +111,9 @@ public class KeyTaskService {
     public KeyTask getUserKeyTask(Map<String, Object> searchParams) {
         Specification<KeyTask> spec = buildSpecification(searchParams);
         return keyTaskDao.findOne(spec);
+    }
+
+    public KeyTask getUserKeyTask(String userLoginName) {
+        return keyTaskDao.findOne(userLoginName);
     }
 }
