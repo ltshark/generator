@@ -30,7 +30,7 @@
                             <li><a href="${ctx}/admin/user">用户管理</a></li>
                             <li class="divider"></li>
                             <li><a href="${ctx}/admin/key/listUserKeyTask">批量申请证书</a></li>
-                            <% if (((ShiroDbRealm.ShiroUser) SecurityUtils.getSubject().getPrincipal()).department == "Network") {%>
+                            <% if ("Network".equals(((ShiroDbRealm.ShiroUser) SecurityUtils.getSubject().getPrincipal()).department)) {%>
                             <li><a href="${ctx}/admin/key/listKeyTask?taskStatus=1">待审批申请</a></li>
                             <li><a href="${ctx}/admin/key/listKeyTask?taskStatus=2">已审批申请</a></li>
                             <li><a href="${ctx}/admin/key/listKeyTask?taskStatus=3">已拒绝申请</a></li>
