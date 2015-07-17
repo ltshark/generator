@@ -18,7 +18,7 @@ public interface KeyTaskDao {
 
     KeyTask findOne(String id);
 
-    List<KeyTask> findAll();
+    Page<KeyTask> findAll(int pageNumber, int pageSize);
 
     void save(KeyTask entity);
 

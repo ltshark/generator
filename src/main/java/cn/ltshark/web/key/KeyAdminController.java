@@ -54,15 +54,15 @@ public class KeyAdminController {
                               @RequestParam(value = "taskStatus", defaultValue = KeyTask.APPLYING_STATUS) String taskStatus,
                               Model model,
                               ServletRequest request) {
-        Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
-        searchParams.put("EQ_status", taskStatus);
-        Page<KeyTask> keyTasks = keyTaskService.getKeyTask(searchParams, pageNumber, pageSize, sortType);
+//        Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
+//        searchParams.put("EQ_status", taskStatus);
+        Page<KeyTask> keyTasks = keyTaskService.getKeyTask(pageNumber, pageSize);
         model.addAttribute("tasks", keyTasks);
-        model.addAttribute("sortType", sortType);
-        model.addAttribute("sortTypes", sortTypes);
+//        model.addAttribute("sortType", sortType);
+//        model.addAttribute("sortTypes", sortTypes);
         model.addAttribute("taskStatus", taskStatus);
         // 将搜索条件编码成字符串，用于排序，分页的URL
-        model.addAttribute("searchParams", Servlets.encodeParameterStringWithPrefix(searchParams, "search_"));
+//        model.addAttribute("searchParams", Servlets.encodeParameterStringWithPrefix(searchParams, "search_"));
 
         return "key/listKeyTask";
     }

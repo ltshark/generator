@@ -57,7 +57,7 @@ public class KeyTaskDaoImpl implements KeyTaskDao {
     }
 
     @Override
-    public List<KeyTask> findAll() {
+    public Page<KeyTask> findAll(int pageNumber, int pageSize) {
         return null;
     }
 

@@ -40,16 +40,15 @@ public class KeyTaskService {
         keyTaskDao.deleteByUserLoginName(userLoginName);
     }
 
-    public List<KeyTask> getAllKeyTask() {
-        return keyTaskDao.findAll();
+    public Page<KeyTask> getAllKeyTask() {
+        return keyTaskDao.findAll(0, -1);
     }
 
-    public Page<KeyTask> getKeyTask(Map<String, Object> searchParams, int pageNumber, int pageSize,
-                                    String sortType) {
-        PageRequest pageRequest = buildPageRequest(pageNumber, pageSize, sortType);
-        Specification<KeyTask> spec = buildSpecification(searchParams);
+    public Page<KeyTask> getKeyTask(int pageNumber, int pageSize) {
+//        PageRequest pageRequest = buildPageRequest(pageNumber, pageSize, sortType);
+//        Specification<KeyTask> spec = buildSpecification(searchParams);
 
-        return keyTaskDao.findAll(spec, pageRequest);
+        return keyTaskDao.findAll(pageNumber, pageSize);
     }
 
     public List<KeyTask> getUserKeyTasks(Map<String, Object> searchParams) {
