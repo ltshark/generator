@@ -40,34 +40,22 @@ public class KeyTaskService {
         keyTaskDao.deleteByUserLoginName(userLoginName);
     }
 
-    public Page<KeyTask> getAllKeyTask() {
-        return keyTaskDao.findAll(0, -1);
-    }
-
-    public Page<KeyTask> getKeyTask(int pageNumber, int pageSize) {
-//        PageRequest pageRequest = buildPageRequest(pageNumber, pageSize, sortType);
+    public Page<KeyTask> getKeyTask(int pageNumber, int pageSize, Map<String, Object> searchParams) {
+        PageRequest pageRequest = buildPageRequest(pageNumber, pageSize);
 //        Specification<KeyTask> spec = buildSpecification(searchParams);
-
-        return keyTaskDao.findAll(pageNumber, pageSize);
+        return keyTaskDao.findAll(searchParams, pageRequest);
     }
 
-    public List<KeyTask> getUserKeyTasks(Map<String, Object> searchParams) {
-        Specification<KeyTask> spec = buildSpecification(searchParams);
-        return keyTaskDao.findAll(spec);
-    }
+//    public List<KeyTask> getUserKeyTasks(Map<String, Object> searchParams) {
+//        Specification<KeyTask> spec = buildSpecification(searchParams);
+//        return keyTaskDao.findAll(spec);
+//    }
 
     /**
      * 创建分页请求.
      */
-    private PageRequest buildPageRequest(int pageNumber, int pagzSize, String sortType) {
-        Sort sort = null;
-        if ("auto".equals(sortType)) {
-            sort = new Sort(Direction.DESC, "id");
-        } else if ("title".equals(sortType)) {
-            sort = new Sort(Direction.ASC, "title");
-        }
-
-        return new PageRequest(pageNumber - 1, pagzSize, sort);
+    private PageRequest buildPageRequest(int pageNumber, int pagzSize) {
+        return new PageRequest(pageNumber - 1, pagzSize);
     }
 
     /**

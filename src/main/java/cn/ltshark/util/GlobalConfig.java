@@ -3,6 +3,7 @@ package cn.ltshark.util;
 import cn.ltshark.entity.KeyTask;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 public class GlobalConfig {
 
     public static final String UTF_8 = "UTF-8";
+    public static final Charset UTF_8_CHARSET = Charset.forName(UTF_8);
 
     public static final String ROOT_PATH = "/data/generator";
 

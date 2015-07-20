@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ltshark on 15/6/7.
@@ -28,5 +29,5 @@ public interface KeyTaskDao {
 
     List<KeyTask> findAll(Specification<KeyTask> spec);
 
-    Page<KeyTask> findAll(Specification<KeyTask> spec, PageRequest pageRequest);
+    Page<KeyTask> findAll(Map<String, Object> spec, PageRequest pageRequest);
 }

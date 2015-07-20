@@ -54,9 +54,9 @@ public class KeyAdminController {
                               @RequestParam(value = "taskStatus", defaultValue = KeyTask.APPLYING_STATUS) String taskStatus,
                               Model model,
                               ServletRequest request) {
-//        Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
-//        searchParams.put("EQ_status", taskStatus);
-        Page<KeyTask> keyTasks = keyTaskService.getKeyTask(pageNumber, pageSize);
+        Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
+        searchParams.put("status", taskStatus);
+        Page<KeyTask> keyTasks = keyTaskService.getKeyTask(pageNumber, pageSize, searchParams);
         model.addAttribute("tasks", keyTasks);
 //        model.addAttribute("sortType", sortType);
 //        model.addAttribute("sortTypes", sortTypes);
@@ -103,9 +103,9 @@ public class KeyAdminController {
         return "redirect:/admin/key/listUserKeyTask";
     }
 
-    private String handleTask(@PathVariable("id") String id, RedirectAttributes redirectAttributes, String agreeApplyStatus) {
+    private String handleTask(String id, RedirectAttributes redirectAttributes, String state) {
         KeyTask keyTask = keyTaskService.getUserKeyTask(id);
-        keyTask.setStatus(agreeApplyStatus);
+        keyTask.setStatus(state);
         keyTask.setApprovalDate(new Date());
         keyTaskService.saveKeyTask(keyTask);
         redirectAttributes.addFlashAttribute("message", "审批任务完成");
