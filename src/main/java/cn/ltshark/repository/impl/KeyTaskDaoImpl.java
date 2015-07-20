@@ -4,7 +4,6 @@ import cn.ltshark.entity.KeyTask;
 import cn.ltshark.repository.KeyTaskDao;
 import cn.ltshark.util.GlobalConfig;
 import com.google.common.io.Files;
-import org.apache.commons.io.FileSystemUtils;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +109,7 @@ public class KeyTaskDaoImpl implements KeyTaskDao {
         List<KeyTask> list = new ArrayList<KeyTask>();
         for (File file : files) {
             try {
-                KeyTask e = KeyTask.toKeyTask(Files.readFirstLine(file, GlobalConfig.UTF_8_CHARSET));
+                KeyTask e = KeyTask.toKeyTask(FileUtils.readFileToString(file, GlobalConfig.UTF_8));
                 list.add(e);
             } catch (IOException e1) {
                 e1.printStackTrace();
