@@ -3,6 +3,7 @@ package cn.ltshark.util;
 import cn.ltshark.entity.KeyTask;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,8 @@ public class GlobalConfig {
         stateToPath.put(KeyTask.APPLYING_STATUS, APPLYING_TASK_PATH);
         stateToPath.put(KeyTask.AGREE_APPLY_STATUS, AGREE_TASK_PATH);
         stateToPath.put(KeyTask.REFUSE_APPLY_STATUS, REFUSE_TASK_PATH);
+        for (String path : stateToPath.values())
+            new File(path).mkdirs();
     }
 
     public static String getStatePath(String state) {
